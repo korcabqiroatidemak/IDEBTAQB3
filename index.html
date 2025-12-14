@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (F4 Manual Margin Fix)</title>
+    <title>Cetak Kartu EBTAQ (Fix Background Print)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -12,7 +12,7 @@
         /* ================================================= */
         body {
             font-family: Arial, Helvetica, sans-serif;
-            /* background-color: #525659; */
+            background-color: #525659;
             margin: 0;
             padding: 20px 0;
             display: flex;
@@ -23,32 +23,28 @@
 
         /* Container Kertas F4 Visual */
         .page-container {
-            /* background-color: white; */
+            background-color: white;
             
-            /* --- LEBAR KONTEN PAS (180mm) --- */
-            /* 85mm (kartu) + 10mm (gap) + 85mm (kartu) = 180mm */
-            width: 215mm; /* width: 180mm; */
-            height: 330mm; /* Tinggi F4 */
+            /* LEBAR KONTEN PAS (180mm) */
+            width: 215mm; 
+            height: 330mm; 
             
-            /* POSISI DI LAYAR: Tetap Auto (Center) */
+            /* POSISI DI LAYAR: Center */
             margin-bottom: 30px; 
-            
-            /* Efek Bayangan */
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            
             box-sizing: border-box;
             
             /* GRID LAYOUT */
             display: grid;
-            grid-template-columns: 85mm 85mm; /* Lebar kolom fix */
+            grid-template-columns: 85mm 85mm; 
             grid-template-rows: repeat(3, auto);
             
-            /* Center Content di dalam container */
+            /* Center Content */
             justify-content: center;
             align-content: center;
             
             /* GAP */
-            column-gap: 10mm; /* 10mm Fix */
+            column-gap: 10mm;
             row-gap: 1px;     
             
             page-break-after: always;
@@ -58,20 +54,19 @@
         /* 2. TAMPILAN CETAK (PRINT VIEW - Ctrl+P)           */
         /* ================================================= */
         @page {
-            size: 215mm 330mm; /* Ukuran Kertas F4 Asli */
-            margin: 0;         /* Margin 0 agar kita atur sendiri */
+            size: 215mm 330mm; 
+            margin: 0;         
         }
 
         @media print {
             body {
-                /* background-color: white; */
+                background-color: white;
                 padding: 0;
-                display: block; /* Reset flexbox */
+                display: block; 
             }
             .page-container {
-                /* --- KUNCI POSISI DI SINI --- */
-                /* Kita hitung manual: (215 - 180) / 2 = 17.5mm */
-                /* margin-left: 17.5mm !important; */
+                /* Perhitungan Manual Margin Kiri: (215 - 180) / 2 = 17.5mm */
+                margin-left: 17.5mm !important; 
                 
                 margin-top: 0;
                 margin-bottom: 0;
@@ -80,16 +75,24 @@
                 page-break-after: always;
             }
             #loading { display: none; }
+
+            /* --- PERBAIKAN: PAKSA WARNA BACKGROUND TERCETAK --- */
+            .nomor-urut-box {
+                background-color: #FFC000 !important; /* Paksa Kuning */
+                -webkit-print-color-adjust: exact !important; /* Chrome/Safari/Edge */
+                print-color-adjust: exact !important;         /* Firefox */
+                color-adjust: exact !important;
+            }
         }
 
         /* ================================================= */
-        /* 3. DESAIN KARTU (8.5 cm x 10.8 cm)                */
+        /* 3. DESAIN KARTU                                   */
         /* ================================================= */
         .kartu-peserta {
-            width: 85mm; /* 8.5cm */
-            height: 108mm; /* 10.8cm */
+            width: 85mm; 
+            height: 108mm; 
             border: 2px solid #000;
-            /* background: white; */
+            background: white;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -102,7 +105,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 14.3mm; /* 1.43cm */
+            height: 14.3mm;
             border-bottom: 3px double #000;
             padding: 0 2px;
             box-sizing: border-box;
@@ -129,7 +132,7 @@
         .nomor-urut-box {
             width: 13mm;
             height: 80%;
-            background-color: #FFC000;
+            background-color: #FFC000; /* Warna Kuning Default */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -137,16 +140,19 @@
             font-size: 12pt;
             font-family: 'OCR-A BT', 'Courier New', Courier, monospace;
             border: 1px solid #000;
+            
+            /* Tambahan agar di layar juga konsisten settingannya */
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        /* --- B. BODY ATAS (5.3 cm) --- */
+        /* --- B. BODY ATAS --- */
         .body-upper {
             display: flex;
             height: 53mm; 
             border-bottom: 1px solid #000;
             box-sizing: border-box;
         }
-        /* Foto: 3.96cm */
         .foto-container {
             width: 39.6mm; 
             height: 100%;
@@ -171,7 +177,6 @@
             height: 100%;
             object-fit: cover;
         }
-        /* QR: 4.54cm */
         .qr-container {
             width: 45.4mm;
             height: 100%;
@@ -203,7 +208,7 @@
             margin-bottom: 5px;
         }
 
-        /* --- C. NAMA (1.2 cm) --- */
+        /* --- C. NAMA --- */
         .nama-container {
             width: 100%;
             height: 12mm;
@@ -411,7 +416,7 @@
                     <table cellspacing="0">
                         <tr>
                             <td class="col-label">Tpt. Tgl. Lahir</td>
-                            <td class="col-val">${TTL}</td>
+                            <td class="col-val" style="text-transform: none;">${TTL}</td>
                         </tr>
                         <tr>
                             <td class="col-label">Nama Ayah</td>
@@ -450,9 +455,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-

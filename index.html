@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ Presisi</title>
+    <title>Cetak Kartu EBTAQ Final</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -45,13 +45,12 @@
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu (Lebar Total 8.69 cm) */
+        /* 3. Desain Kartu (Lebar 8.69 cm) */
         /* ================================================= */
         .kartu-peserta {
-            width: 8.69cm; /* Sesuai instruksi */
-            /* Tinggi total otomatis mengikuti konten atau bisa diset fixed */
-            /* height: 10.8cm; (Opsional, jika ingin tinggi fix) */
-            border: 1px solid #000;
+            width: 8.69cm;
+            /* Tinggi total otomatis (sekitar 10.8cm) */
+            border: 2px solid #000; /* Border Luar Kartu */
             background: white;
             display: flex;
             flex-direction: column;
@@ -61,18 +60,17 @@
         }
 
         /* --- A. HEADER --- */
-        /* Tinggi 1.43 cm, Lebar 8.69 cm */
+        /* Tinggi 1.43 cm */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             height: 1.43cm;
-            border-bottom: 3px double #000;
+            border-bottom: 3px double #000; /* Garis pemisah header */
             padding: 0 2px;
             box-sizing: border-box;
         }
         .logo-box {
-            /* Area Logo (Kiri) - Estimasi agar proporsional */
             width: 1.3cm; 
             height: 100%;
             display: flex;
@@ -84,56 +82,54 @@
             max-width: 100%;
         }
         .title-box {
-            /* Judul (Tengah) */
             flex: 1;
             text-align: center;
-            font-family: 'Times New Roman', Times, serif; /* TNR */
+            font-family: 'Times New Roman', Times, serif;
             font-weight: bold;
-            font-size: 10pt; /* Ukuran 10 */
+            font-size: 10pt;
             line-height: 1.1;
         }
         .nomor-urut-box {
-            /* Nomor (Kanan) */
-            width: 1.3cm; /* Estimasi agar muat 3 digit */
+            width: 1.3cm;
             height: 80%;
-            background-color: #FFC000; /* Warna Sorotan */
+            background-color: #FFC000;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 12pt;
-            font-family: 'OCR-A BT', 'Courier New', Courier, monospace; /* OCR-A BT */
-            border: 1px solid #000; /* Opsional, agar rapi */
+            font-family: 'OCR-A BT', 'Courier New', Courier, monospace;
+            border: 1px solid #000;
         }
 
         /* --- B. BODY ATAS (FOTO & QR) --- */
-        /* Tinggi 5 cm */
+        /* Tinggi diperbarui jadi 5.3 cm */
         .body-upper {
             display: flex;
-            height: 5.0cm;
-            border-bottom: 1px solid #000;
+            height: 5.3cm; 
+            border-bottom: 1px solid #000; /* Garis pemisah body */
             box-sizing: border-box;
         }
         
-        /* Kiri: Foto (Lebar 4.15 cm) */
+        /* Foto (Kiri) */
         .foto-container {
             width: 4.15cm;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-right: 1px solid #000;
+            border-right: 1px solid #000; /* Garis tengah vertikal */
             box-sizing: border-box;
         }
         .foto-box {
-            width: 3cm;  /* Ukuran Foto 3x4 */
+            width: 3cm;  /* Foto 3x4 */
             height: 4cm;
             background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Border tipis di sekitar foto itu sendiri */
         }
         .foto-box img {
             width: 100%;
@@ -141,14 +137,14 @@
             object-fit: cover;
         }
 
-        /* Kanan: QR (Lebar 4.54 cm) */
+        /* QR (Kanan) */
         .qr-container {
             width: 4.54cm;
             height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: start; /* Mulai dari atas */
+            justify-content: start;
             padding-top: 5px; 
             box-sizing: border-box;
         }
@@ -157,28 +153,24 @@
             font-family: Arial, sans-serif;
             font-size: 9pt;
             text-decoration: underline;
-            margin-bottom: 1.2em; /* Jarak 1 enter (approx) */
+            margin-bottom: 1.2em;
         }
         .qr-canvas {
-            /* Ukuran QR 3.2 cm */
             width: 3.2cm;
             height: 3.2cm;
             display: flex;
             justify-content: center;
         }
-        .qr-canvas img {
-            width: 100%;
-        }
         .id-text {
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
             font-size: 10pt;
-            margin-top: auto; /* Auto spacing (dorong ke bawah/tengah sisa ruang) */
+            margin-top: auto;
             margin-bottom: 5px;
         }
 
         /* --- C. BODY BAWAH (NAMA) --- */
-        /* Tinggi 1.2 cm, Lebar 8.69 cm */
+        /* Tinggi 1.2 cm */
         .nama-container {
             width: 8.69cm;
             height: 1.2cm;
@@ -186,7 +178,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid #000; /* Garis bawah nama */
             
             font-family: 'Arial Narrow', Arial, sans-serif;
             font-weight: bold;
@@ -200,31 +192,32 @@
         .table-container {
             width: 8.69cm;
             box-sizing: border-box;
+            /* Tidak ada border container di sini agar tidak double */
         }
         table {
             width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif; /* Arial Body */
-            font-size: 10pt; /* Ukuran 10 */
+            border-collapse: collapse; /* Agar garis menyatu */
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
         }
         tr {
-            height: 0.7cm; /* Tinggi baris 0.7 cm */
+            height: 0.7cm;
         }
         td {
-            border: 1px solid #000;
+            border: 1px solid #000; /* Garis dasar setiap sel */
             padding: 0 5px;
             vertical-align: middle;
             box-sizing: border-box;
         }
-        /* Kolom Label: Lebar 3.1 cm */
-        .col-label {
-            width: 3.1cm;
-        }
-        /* Kolom Isi: Lebar 5.5 cm */
-        .col-val {
-            width: 5.5cm;
-            text-transform: uppercase;
-        }
+        
+        /* --- TEKNIK HAPUS BORDER BERTUMPUK --- */
+        /* Menghapus garis pinggir tabel agar menyatu dengan border kartu */
+        table tr td:first-child { border-left: none; }  /* Hapus garis kiri tabel */
+        table tr td:last-child { border-right: none; }  /* Hapus garis kanan tabel */
+        table tr:last-child td { border-bottom: none; } /* Hapus garis bawah tabel */
+
+        .col-label { width: 3.1cm; }
+        .col-val { width: 5.5cm; text-transform: uppercase; }
 
         /* Print Mode */
         @media print {
@@ -250,7 +243,7 @@
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form Responses 1`; 
         
-        // --- LOGO: Pastikan file ini ada di GitHub ---
+        // --- LOGO: Nama File HURUF BESAR sesuai instruksi ---
         const LOGO_FILENAME = "QIRAATI.png"; 
 
         const mainOutput = document.getElementById('main-output');
@@ -291,7 +284,6 @@
                 allParticipants.push(p);
             }
 
-            // 4 KARTU PER HALAMAN
             const ITEMS_PER_PAGE = 4;
             let currentPageDiv = createNewPage();
 
@@ -304,7 +296,6 @@
                 const cardElement = createCardHTML(data, index);
                 currentPageDiv.appendChild(cardElement);
 
-                // Generate QR
                 setTimeout(() => {
                     generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`);
                 }, 10);
@@ -395,7 +386,6 @@
             const el = document.getElementById(elementId);
             if(el) {
                 el.innerHTML = "";
-                // Generate QR dengan ukuran sesuai container (3.2cm ~ 120px)
                 new QRCode(el, {
                     text: text || "NO DATA",
                     width: 120, 
@@ -411,4 +401,3 @@
     </script>
 </body>
 </html>
-

@@ -3,62 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (F4 - 6 Kartu Rapat)</title>
+    <title>Cetak Kartu EBTAQ (F4 Center - 8.5cm)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ================================================= */
-        /* 1. Page Setup (F4 / Folio) */
+        /* 1. Page Setup (F4 Full Tanpa Margin Hardware) */
         /* ================================================= */
         @page {
-            /* Ukuran F4: 215mm x 330mm */
             size: 215mm 330mm; 
-            /* Margin halaman dikembalikan normal (1cm) agar aman untuk printer */
-            margin: 10mm; 
+            margin: 0; /* Margin 0 agar CSS bisa mengatur posisi center */
         }
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #eee;
+            background-color: #eee; /* Abu-abu di layar, putih saat print */
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
         /* ================================================= */
-        /* 2. Grid Container (6 Kartu di Tengah Halaman) */
+        /* 2. Container Halaman (Layout Center Dinamis) */
         /* ================================================= */
         .page-container {
             background-color: white;
-            /* Ukuran area konten di dalam margin */
-            /* Lebar F4 (215) - Margin Kiri Kanan (20) = sktr 195mm */
-            width: 195mm; 
-            /* Tinggi F4 (330) - Margin Atas Bawah (20) = sktr 310mm */
-            height: 310mm; 
+            width: 215mm;
+            height: 330mm;
             
-            margin: 0 auto;
-            box-sizing: border-box;
-            
+            /* Menggunakan GRID untuk memposisikan kartu */
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 Kolom */
-            grid-template-rows: repeat(3, auto); /* 3 Baris mengikuti tinggi kartu */
             
-            justify-content: center; /* Grid ada di tengah horizontal */
-            align-content: center;   /* Grid ada di tengah vertikal */
+            /* Struktur 2 Kolom x 3 Baris */
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(3, auto);
             
-            /* PENGATURAN JARAK ANTAR KARTU */
-            column-gap: 5mm; /* Jarak antar kolom (Kiri-Kanan) */
-            row-gap: 0;      /* Jarak antar baris (Atas-Bawah) dinolkan agar nempel */
+            /* LOGIKA CENTER: Grid dikumpulkan di tengah halaman */
+            justify-content: center; /* Center Horizontal (Kiri-Kanan) */
+            align-content: center;   /* Center Vertikal (Atas-Bawah) */
+            
+            /* LOGIKA GAP: */
+            column-gap: 10px; /* Celah potong vertikal */
+            row-gap: 1px;     /* Garis putih tipis pemisah atas-bawah */
             
             page-break-after: always;
+            box-sizing: border-box;
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu (8.5 cm x 10.8 cm) */
+        /* 3. Desain Kartu (Lebar Revisi 8.5 cm) */
         /* ================================================= */
         .kartu-peserta {
             width: 8.5cm; 
-            height: 10.8cm; 
+            height: 10.8cm;
             border: 2px solid #000;
             background: white;
             display: flex;
@@ -66,8 +63,6 @@
             box-sizing: border-box;
             position: relative;
             overflow: hidden;
-            /* Tambahan: Garis potong visual tipis di luar border (opsional) */
-            outline: 1px dashed #ccc; 
         }
 
         /* --- A. HEADER --- */
@@ -112,13 +107,14 @@
             border: 1px solid #000;
         }
 
-        /* --- B. BODY ATAS (5.3 cm) --- */
+        /* --- B. BODY ATAS (Tinggi Revisi 5.3 cm) --- */
         .body-upper {
             display: flex;
             height: 5.3cm; 
             border-bottom: 1px solid #000;
             box-sizing: border-box;
         }
+        /* FOTO (Kiri): Lebar dikurangi (8.5 - 4.54 = 3.96cm) */
         .foto-container {
             width: 3.96cm; 
             height: 100%;
@@ -143,6 +139,7 @@
             height: 100%;
             object-fit: cover;
         }
+        /* QR (Kanan): Lebar Tetap 4.54cm */
         .qr-container {
             width: 4.54cm;
             height: 100%;
@@ -174,9 +171,9 @@
             margin-bottom: 5px;
         }
 
-        /* --- C. NAMA (1.2 cm) --- */
+        /* --- C. NAMA (Tinggi 1.2 cm) --- */
         .nama-container {
-            width: 100%;
+            width: 100%; 
             height: 1.2cm;
             display: flex;
             align-items: center;
@@ -191,10 +188,10 @@
             box-sizing: border-box;
         }
 
-        /* --- D. TABEL DATA --- */
+        /* --- D. TABEL DATA (Clean Edges) --- */
         .table-container {
             width: 100%;
-            flex: 1;
+            flex: 1; /* Mengisi sisa ruang */
             box-sizing: border-box;
         }
         table {
@@ -204,6 +201,7 @@
             font-family: Arial, sans-serif;
             font-size: 10pt;
         }
+        /* Hapus garis pinggir tabel agar tidak bertumpuk dengan border kartu */
         table tr td:first-child { border-left: none; }
         table tr td:last-child { border-right: none; }
         table tr:last-child td { border-bottom: none; }
@@ -215,16 +213,19 @@
             box-sizing: border-box;
         }
         .col-label { width: 3.1cm; }
+        /* Lebar Value: 8.5 - 3.1 = 5.4cm */
         .col-val { width: 5.4cm; text-transform: uppercase; }
 
+        /* Print Mode */
         @media print {
             body { background-color: white; }
             .page-container {
-                margin: 0 auto; /* Tengah halaman */
+                margin: 0;
                 box-shadow: none;
                 border: none;
-                height: 100vh;
-                width: 100%;
+                /* Pastikan full page agar posisi center bekerja */
+                height: 330mm; 
+                width: 215mm;
             }
             #loading { display: none; }
         }
@@ -246,16 +247,19 @@
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
 
+        // --- Helper 1: Title Case (DEMAK -> Demak) ---
         function toTitleCase(str) {
             return str.replace(/\w\S*/g, function(txt){
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             });
         }
 
+        // --- Helper 2: Format Tanggal (15 Nov 2011) ---
         function formatTanggalIndo(dateStr) {
             if (!dateStr) return '';
             const bulanIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             let d, m, y;
+            // Regex dd/mm/yyyy
             const matchSlash = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
             if (matchSlash) {
                 d = parseInt(matchSlash[1]);
@@ -312,6 +316,7 @@
                 allParticipants.push(p);
             }
 
+            // 6 KARTU PER HALAMAN F4
             const ITEMS_PER_PAGE = 6; 
             let currentPageDiv = createNewPage();
 
@@ -353,10 +358,11 @@
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
 
+            // LOGIKA FORMAT TTL BARU
             const rawTempat = data['Tempat Lahir'] || '';
             const rawTanggal = data['Tanggal Lahir'] || '';
-            const tempatFormatted = toTitleCase(rawTempat);
-            const tanggalFormatted = formatTanggalIndo(rawTanggal);
+            const tempatFormatted = toTitleCase(rawTempat);     // Title Case
+            const tanggalFormatted = formatTanggalIndo(rawTanggal); // dd Mmm yyyy
             const TTL = (tempatFormatted && tanggalFormatted) ? `${tempatFormatted}, ${tanggalFormatted}` : '-';
 
             card.innerHTML = `

@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ Final</title>
+    <title>Cetak Kartu EBTAQ (F4 - 6 Kartu)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ================================================= */
-        /* 1. Page Setup (A4 Portrait) */
+        /* 1. Page Setup (F4 / Folio) */
         /* ================================================= */
         @page {
-            size: A4 portrait;
-            margin: 1cm;
+            /* Ukuran F4 Indonesia: 215mm x 330mm */
+            size: 215mm 330mm; 
+            /* Margin sangat tipis agar muat 3 baris */
+            margin: 3mm; 
         }
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -24,33 +26,38 @@
         }
 
         /* ================================================= */
-        /* 2. Grid Container (2x2 = 4 Kartu) */
+        /* 2. Grid Container (2 Kolom x 3 Baris = 6 Kartu) */
         /* ================================================= */
         .page-container {
             background-color: white;
-            width: 21cm;
-            height: 29.7cm;
-            padding: 1cm;
-            margin: 20px auto;
+            width: 215mm;       /* Lebar F4 */
+            height: 329mm;      /* Tinggi F4 (dikurangi dikit toleransi) */
+            padding: 0;         /* Padding 0 agar muat */
+            margin: 10px auto;
             box-sizing: border-box;
             
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr; 
+            /* 3 Baris proporsional */
+            grid-template-rows: repeat(3, 1fr); 
+            
             justify-items: center; 
-            align-items: start;
-            gap: 10px;
+            align-items: center; /* Posisi vertikal tengah */
+            
+            /* Gap antar kartu */
+            column-gap: 10px;
+            row-gap: 1px; /* Gap baris sangat kecil agar muat */
             
             page-break-after: always;
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu (Lebar 8.69 cm) */
+        /* 3. Desain Kartu (Tetap 8.69 cm x 10.8 cm) */
         /* ================================================= */
         .kartu-peserta {
             width: 8.69cm;
-            /* Tinggi total otomatis (sekitar 10.8cm) */
-            border: 2px solid #000; /* Border Luar Kartu */
+            height: 10.8cm; /* Tinggi Fix agar 3 baris pas 32.4cm */
+            border: 2px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
@@ -60,13 +67,12 @@
         }
 
         /* --- A. HEADER --- */
-        /* Tinggi 1.43 cm */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             height: 1.43cm;
-            border-bottom: 3px double #000; /* Garis pemisah header */
+            border-bottom: 3px double #000;
             padding: 0 2px;
             box-sizing: border-box;
         }
@@ -102,42 +108,37 @@
             border: 1px solid #000;
         }
 
-        /* --- B. BODY ATAS (FOTO & QR) --- */
-        /* Tinggi diperbarui jadi 5.3 cm */
+        /* --- B. BODY ATAS (5.3 cm) --- */
         .body-upper {
             display: flex;
             height: 5.3cm; 
-            border-bottom: 1px solid #000; /* Garis pemisah body */
+            border-bottom: 1px solid #000;
             box-sizing: border-box;
         }
-        
-        /* Foto (Kiri) */
         .foto-container {
             width: 4.15cm;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-right: 1px solid #000; /* Garis tengah vertikal */
+            border-right: 1px solid #000;
             box-sizing: border-box;
         }
         .foto-box {
-            width: 3cm;  /* Foto 3x4 */
+            width: 3cm;
             height: 4cm;
             background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 1px solid #ccc; /* Border tipis di sekitar foto itu sendiri */
+            border: 1px solid #ccc;
         }
         .foto-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        /* QR (Kanan) */
         .qr-container {
             width: 4.54cm;
             height: 100%;
@@ -169,8 +170,7 @@
             margin-bottom: 5px;
         }
 
-        /* --- C. BODY BAWAH (NAMA) --- */
-        /* Tinggi 1.2 cm */
+        /* --- C. NAMA (1.2 cm) --- */
         .nama-container {
             width: 8.69cm;
             height: 1.2cm;
@@ -178,7 +178,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-bottom: 1px solid #000; /* Garis bawah nama */
+            border-bottom: 1px solid #000;
             
             font-family: 'Arial Narrow', Arial, sans-serif;
             font-weight: bold;
@@ -188,34 +188,30 @@
             box-sizing: border-box;
         }
 
-        /* --- D. TABEL DATA --- */
+        /* --- D. TABEL DATA (Sisa Tinggi) --- */
         .table-container {
             width: 8.69cm;
+            flex: 1; /* Mengisi sisa ruang tinggi kartu */
             box-sizing: border-box;
-            /* Tidak ada border container di sini agar tidak double */
         }
         table {
             width: 100%;
-            border-collapse: collapse; /* Agar garis menyatu */
+            height: 100%;
+            border-collapse: collapse;
             font-family: Arial, sans-serif;
             font-size: 10pt;
         }
-        tr {
-            height: 0.7cm;
-        }
+        /* Hapus border luar agar clean */
+        table tr td:first-child { border-left: none; }
+        table tr td:last-child { border-right: none; }
+        table tr:last-child td { border-bottom: none; }
+
         td {
-            border: 1px solid #000; /* Garis dasar setiap sel */
+            border: 1px solid #000;
             padding: 0 5px;
             vertical-align: middle;
             box-sizing: border-box;
         }
-        
-        /* --- TEKNIK HAPUS BORDER BERTUMPUK --- */
-        /* Menghapus garis pinggir tabel agar menyatu dengan border kartu */
-        table tr td:first-child { border-left: none; }  /* Hapus garis kiri tabel */
-        table tr td:last-child { border-right: none; }  /* Hapus garis kanan tabel */
-        table tr:last-child td { border-bottom: none; } /* Hapus garis bawah tabel */
-
         .col-label { width: 3.1cm; }
         .col-val { width: 5.5cm; text-transform: uppercase; }
 
@@ -226,7 +222,7 @@
                 margin: 0;
                 box-shadow: none;
                 border: none;
-                height: auto;
+                height: 100vh; /* Full Height untuk Print */
             }
             #loading { display: none; }
         }
@@ -235,7 +231,7 @@
 <body>
 
     <div id="loading" style="text-align: center; margin-top: 50px;">
-        <h3>Memuat Data...</h3>
+        <h3>Memuat Data (F4 Mode)...</h3>
     </div>
     <div id="main-output"></div>
 
@@ -243,7 +239,6 @@
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form Responses 1`; 
         
-        // --- LOGO: Nama File HURUF BESAR sesuai instruksi ---
         const LOGO_FILENAME = "QIRAATI.png"; 
 
         const mainOutput = document.getElementById('main-output');
@@ -284,7 +279,8 @@
                 allParticipants.push(p);
             }
 
-            const ITEMS_PER_PAGE = 4;
+            // --- SETTING F4: 6 KARTU PER HALAMAN ---
+            const ITEMS_PER_PAGE = 6; 
             let currentPageDiv = createNewPage();
 
             allParticipants.forEach((data, index) => {
@@ -316,7 +312,6 @@
             const card = document.createElement('div');
             card.className = 'kartu-peserta';
 
-            // Mapping Data
             const NO_URUT = String(data['NO']).padStart(3, '0');
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();

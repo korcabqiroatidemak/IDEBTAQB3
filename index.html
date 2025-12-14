@@ -3,148 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak ID Card B3 (4 per Halaman)</title>
+    <title>Cetak Kartu EBTAQ (QR Code)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
         /* ================================================= */
-        /* 1. Reset & Page Setup (A4) */
+        /* 1. Page Setup (A4 Portrait) */
         /* ================================================= */
         @page {
-            size: A4 portrait; /* Kertas A4 Tegak */
-            margin: 1cm;       /* Margin aman printer */
+            size: A4 portrait;
+            margin: 1cm;
         }
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #eee;
-            -webkit-print-color-adjust: exact; /* Agar background warna tecetak */
+            -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
         /* ================================================= */
-        /* 2. Container Halaman (Grid 2x2) */
+        /* 2. Grid Container (2 Kolom x 2 Baris = 4 Kartu) */
         /* ================================================= */
         .page-container {
             background-color: white;
-            width: 21cm;        /* Lebar A4 */
-            height: 29.7cm;     /* Tinggi A4 */
-            padding: 1cm;       
+            width: 21cm;
+            height: 29.7cm;
+            padding: 1cm;
             margin: 20px auto;
             box-sizing: border-box;
             box-shadow: 0 0 5px rgba(0,0,0,0.2);
             
-            /* GRID: 2 Kolom x 2 Baris = 4 Kartu B3 */
             display: grid;
-            grid-template-columns: 1fr 1fr; 
+            grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr; 
-            gap: 15px; /* Jarak potong antar kartu */
-            align-content: start;
+            /* Mengatur posisi agar kartu ada di tengah grid cell */
+            justify-items: center; 
+            align-items: start;
+            gap: 10px;
             
             page-break-after: always;
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu B3 (9.5cm x 12.4cm) */
+        /* 3. Desain Kartu (8.6cm x 10.8cm) */
         /* ================================================= */
-        .kartu-b3 {
-            width: 9.5cm;   /* Lebar standar B3 Portrait */
-            height: 12.4cm; /* Tinggi disesuaikan agar muat 2 baris */
-            border: 2px solid #333; /* Garis tepi tebal */
+        .kartu-peserta {
+            width: 8.6cm;
+            height: 10.8cm;
+            border: 2px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            position: relative;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* HEADER KARTU */
-        .card-header {
-            background-color: #006400; /* Hijau Tua (Ganti jika perlu) */
-            color: white;
-            text-align: center;
-            padding: 8px 0;
-            border-bottom: 2px solid #004d00;
-        }
-        .card-header h2 {
-            margin: 0;
-            font-size: 14pt;
-            text-transform: uppercase;
-        }
-        .card-header p {
-            margin: 2px 0 0;
-            font-size: 9pt;
-            font-weight: normal;
-        }
-
-        /* BODY KARTU */
-        .card-body {
-            padding: 10px;
-            flex: 1;
+        /* --- HEADER --- */
+        .header {
             display: flex;
-            align-items: flex-start; /* Rata atas */
-            font-size: 11pt; /* Font lebih besar untuk B3 */
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px;
+            border-bottom: 3px double #000; /* Garis Ganda */
+            height: 1.8cm;
+        }
+        .logo-box {
+            width: 1.5cm;
+            height: 1.5cm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-box img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .title-box {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 9pt;
+            line-height: 1.1;
+            padding: 0 2px;
+        }
+        .nomor-urut-box {
+            width: 1.2cm;
+            height: 0.8cm;
+            background-color: #FFD700; /* Kuning Emas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace; /* Font Digital look */
+            border: 1px solid #000; /* Opsional: tambah border kotak */
         }
 
-        /* FOTO (KIRI) */
-        .foto-area {
-            width: 3cm;         /* Lebar Tetap 3cm */
-            height: 4cm;        /* Rasio 3x4 */
+        /* --- BODY UTAMA (Foto & QR) --- */
+        .body-upper {
+            display: flex;
+            height: 4.2cm; /* Area Foto dan QR */
+            border-bottom: 1px solid #000;
+        }
+        
+        /* Kiri: Foto */
+        .foto-container {
+            width: 55%;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #000;
+        }
+        .foto-box {
+            width: 3cm;
+            height: 4cm;
             background-color: #f0f0f0;
-            border: 1px solid #999;
-            margin-right: 10px;
-            flex-shrink: 0;     /* Jangan mengecil */
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
-        .foto-area img {
+        .foto-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* DATA (KANAN) */
-        .info-area {
-            flex: 1;
+        /* Kanan: QR Code */
+        .qr-container {
+            width: 45%;
             display: flex;
             flex-direction: column;
-            gap: 4px; /* Jarak antar baris data */
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
         }
-        
-        .row-data {
-            display: flex;
-            line-height: 1.3;
-        }
-        .label {
-            width: 60px; /* Lebar label */
+        .scan-text {
+            color: #007bff; /* Biru seperti contoh */
+            font-size: 8pt;
             font-weight: bold;
-            font-size: 10pt;
-            flex-shrink: 0;
+            margin-bottom: 2px;
+            text-decoration: underline wavy red; /* Efek garis merah bergelombang */
         }
-        .separator {
-            width: 10px;
-            text-align: center;
-            flex-shrink: 0;
+        .qr-canvas {
+            width: 2.2cm;
+            height: 2.2cm;
         }
-        .value {
-            font-size: 10pt; /* Isi Data */
-            word-wrap: break-word; /* Bungkus teks panjang */
+        .qr-canvas img {
+            width: 100%; /* Pastikan QR fit */
+        }
+        .id-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 9pt;
+            margin-top: 2px;
         }
 
-        /* FOOTER / TTD AREA */
-        .card-footer {
+        /* --- NAMA PESERTA --- */
+        .nama-container {
             text-align: center;
-            padding-bottom: 10px;
+            padding: 5px 2px;
+            border-bottom: 1px solid #000;
+            font-weight: bold;
             font-size: 10pt;
+            text-transform: uppercase;
+            background-color: #fff;
         }
-        .ttd-box {
-            height: 40px; /* Ruang TTD */
+
+        /* --- TABEL DATA --- */
+        .table-container {
+            flex: 1;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: middle;
+        }
+        .col-label {
+            width: 32%; /* Lebar kolom label */
+            background-color: #fff;
+        }
+        .col-val {
+            font-weight: 500;
+            text-transform: uppercase;
         }
 
         /* ================================================= */
-        /* 4. Mode Cetak */
+        /* 4. Print Mode */
         /* ================================================= */
         @media print {
             body { background-color: white; }
@@ -152,7 +207,7 @@
                 margin: 0;
                 box-shadow: none;
                 border: none;
-                height: 100vh;
+                height: auto;
             }
             #loading { display: none; }
         }
@@ -160,21 +215,23 @@
 </head>
 <body>
 
-    <div id="loading" style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <h3>Memuat data ID Card B3...</h3>
+    <div id="loading" style="text-align: center; margin-top: 50px;">
+        <h3>Memuat Data & Generate QR Code...</h3>
     </div>
-    
     <div id="main-output"></div>
 
     <script>
-        // --- KONFIGURASI ---
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form Responses 1`; 
-
+        
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
 
-        // --- Helper: Fix Google Drive URL ---
+        // URL Logo Qiroati (Ganti dengan URL logo asli Anda jika ada)
+        // Saya menggunakan placeholder icon Qiroati kuning sementara
+        const LOGO_URL = "QIRAATI.png"; 
+        // NOTE: Ganti URL di atas dengan link logo Qiroati yang benar.
+
         function getDirectDriveUrl(url) {
             if (!url) return '';
             const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -182,7 +239,6 @@
             return url;
         }
 
-        // --- Fetch Data ---
         async function fetchSheetData() {
             try {
                 const response = await fetch(SHEET_URL);
@@ -195,7 +251,6 @@
             }
         }
 
-        // --- Process CSV ---
         function processCSV(csvText) {
             const rows = csvText.trim().split('\n').filter(r => r.trim().length > 0);
             if (rows.length < 2) return;
@@ -203,7 +258,6 @@
             const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
             const allParticipants = [];
 
-            // Parsing Data
             for (let i = 1; i < rows.length; i++) {
                 const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
                 let p = { 'NO': i + 1 };
@@ -213,102 +267,131 @@
                 allParticipants.push(p);
             }
 
-            // --- PAGINATION: 4 KARTU PER HALAMAN (A4) ---
+            // PAGINATION: 4 KARTU (2x2) PER HALAMAN A4
             const ITEMS_PER_PAGE = 4;
             let currentPageDiv = createNewPage();
+            let cardCount = 0;
 
             allParticipants.forEach((data, index) => {
                 if (index > 0 && index % ITEMS_PER_PAGE === 0) {
                     mainOutput.appendChild(currentPageDiv);
                     currentPageDiv = createNewPage();
                 }
-                currentPageDiv.appendChild(createCardHTML(data));
+                
+                // Buat Elemen Kartu
+                const cardElement = createCardHTML(data, index);
+                currentPageDiv.appendChild(cardElement);
+
+                // GENERATE QR CODE (Setelah elemen masuk ke DOM)
+                // Kita beri jeda sedikit agar element render dulu
+                setTimeout(() => {
+                    generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`);
+                }, 10);
             });
 
-            // Append halaman terakhir
             if (currentPageDiv.hasChildNodes()) {
                 mainOutput.appendChild(currentPageDiv);
             }
         }
 
-        // Buat Halaman Baru
         function createNewPage() {
             const div = document.createElement('div');
             div.className = 'page-container';
             return div;
         }
 
-        // Buat HTML Kartu B3
-        function createCardHTML(data) {
+        function createCardHTML(data, index) {
             const card = document.createElement('div');
-            card.className = 'kartu-b3';
+            card.className = 'kartu-peserta';
 
-            // Ambil Data
+            // Data Mapping
+            const NO_URUT = String(data['NO']).padStart(3, '0'); // Format 001, 022
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
-            const LEMBAGA = (data['Asal Lembaga / TPQ'] || '-').toUpperCase();
+            const LEMBAGA = (data['Asal Lembaga / TPQ'] || '-');
             const TTL = (data['Tempat Lahir'] || '') + ', ' + (data['Tanggal Lahir'] || '');
-            const JK = data['Jenis Kelamin'] || '-';
             const BIN = (data['Nama Ayah'] || '-').toUpperCase();
             const BINTI = (data['Nama Ibu'] || '-').toUpperCase();
             
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
 
-            // --- TEMPLATE KARTU B3 ---
+            // Ganti URL logo di bawah ini dengan logo Qiroati yang valid
+            // Saya pakai teks placeholder logo jika gambar error
+            const LOGO_SRC = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7zS4PqVvCgMvCgMvCgMvCgMvCgMvCgMvCgMvCg/s1600/Logo%20Qiroati.png"; // Contoh placeholder
+
             card.innerHTML = `
-                <div class="card-header">
-                    <h2>PESERTA EBTAQ</h2>
-                    <p>TAHUN 1446 H / 2025 M</p>
-                </div>
-
-                <div class="card-body">
-                    <div class="foto-area">
-                         <img src="${FOTO_URL}" 
-                              onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'"
-                         >
+                <div class="header">
+                    <div class="logo-box">
+                        <img src="${LOGO_SRC}" alt="Logo" onerror="this.style.display='none'">
                     </div>
-                    <div class="info-area">
-                        <div class="row-data">
-                            <span class="label">ID</span><span class="separator">:</span>
-                            <span class="value">${ABSEN}</span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">NAMA</span><span class="separator">:</span>
-                            <span class="value"><b>${NAMA}</b></span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">LEMB.</span><span class="separator">:</span>
-                            <span class="value">${LEMBAGA}</span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">TTL</span><span class="separator">:</span>
-                            <span class="value">${TTL}</span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">JK</span><span class="separator">:</span>
-                            <span class="value">${JK}</span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">BIN</span><span class="separator">:</span>
-                            <span class="value">${BIN}</span>
-                        </div>
-                        <div class="row-data">
-                            <span class="label">BINTI</span><span class="separator">:</span>
-                            <span class="value">${BINTI}</span>
-                        </div>
+                    <div class="title-box">
+                        EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)
+                    </div>
+                    <div class="nomor-urut-box">
+                        ${NO_URUT}
                     </div>
                 </div>
 
-                <div class="card-footer">
-                    <div class="ttd-box"></div>
-                    <p style="margin:0;">Ketua Panitia</p>
+                <div class="body-upper">
+                    <div class="foto-container">
+                        <div class="foto-box">
+                            <img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'">
+                        </div>
+                    </div>
+                    <div class="qr-container">
+                        <div class="scan-text">Scan di sini!</div>
+                        <div id="qrcode-${index}" class="qr-canvas"></div>
+                        <div class="id-text">${ABSEN}</div>
+                    </div>
+                </div>
+
+                <div class="nama-container">
+                    ${NAMA}
+                </div>
+
+                <div class="table-container">
+                    <table cellspacing="0">
+                        <tr>
+                            <td class="col-label">Tpt. Tgl. Lahir</td>
+                            <td class="col-val">${TTL}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-label">Nama Ayah</td>
+                            <td class="col-val">${BIN}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-label">Nama Ibu</td>
+                            <td class="col-val">${BINTI}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-label">Lembaga / TKQ</td>
+                            <td class="col-val">${LEMBAGA}</td>
+                        </tr>
+                    </table>
                 </div>
             `;
             return card;
         }
 
-        // Jalankan
+        // Fungsi Helper Library QR Code
+        function generateQRCode(text, elementId) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                // Bersihkan isi div dulu (jaga-jaga)
+                el.innerHTML = "";
+                // Buat QR
+                new QRCode(el, {
+                    text: text || "NO DATA",
+                    width: 75,  // Ukuran QR dalam Pixel
+                    height: 75,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+        }
+
         fetchSheetData();
     </script>
 </body>

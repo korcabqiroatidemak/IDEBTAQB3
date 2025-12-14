@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (F4 - 6 Kartu)</title>
+    <title>Cetak Kartu EBTAQ (F4 Hemat - Single Cut)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -11,9 +11,9 @@
         /* 1. Page Setup (F4 / Folio) */
         /* ================================================= */
         @page {
-            /* Ukuran F4 Indonesia: 215mm x 330mm */
+            /* F4 Size: 215mm x 330mm */
             size: 215mm 330mm; 
-            /* Margin sangat tipis agar muat 3 baris */
+            /* Margin printer minimal (karena area cetak tinggi 32.4cm) */
             margin: 3mm; 
         }
         body {
@@ -26,37 +26,36 @@
         }
 
         /* ================================================= */
-        /* 2. Grid Container (2 Kolom x 3 Baris = 6 Kartu) */
+        /* 2. Grid Container (6 Kartu Rapet) */
         /* ================================================= */
         .page-container {
             background-color: white;
-            width: 215mm;       /* Lebar F4 */
-            height: 329mm;      /* Tinggi F4 (dikurangi dikit toleransi) */
-            padding: 0;         /* Padding 0 agar muat */
-            margin: 10px auto;
+            width: 215mm;
+            height: 329mm; /* Toleransi 1mm */
+            margin: 0 auto;
             box-sizing: border-box;
             
             display: grid;
             grid-template-columns: 1fr 1fr;
-            /* 3 Baris proporsional */
+            /* 3 Baris */
             grid-template-rows: repeat(3, 1fr); 
             
             justify-items: center; 
-            align-items: center; /* Posisi vertikal tengah */
+            align-items: center;
             
-            /* Gap antar kartu */
-            column-gap: 10px;
-            row-gap: 1px; /* Gap baris sangat kecil agar muat */
+            /* GAP BARIS 0 UNTUK SINGLE CUT */
+            column-gap: 1cm; /* Jarak horizontal antar kolom */
+            row-gap: 0;      /* Kartu nempel atas-bawah */
             
             page-break-after: always;
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu (Tetap 8.69 cm x 10.8 cm) */
+        /* 3. Desain Kartu (Lebar Baru 8.5 cm) */
         /* ================================================= */
         .kartu-peserta {
-            width: 8.69cm;
-            height: 10.8cm; /* Tinggi Fix agar 3 baris pas 32.4cm */
+            width: 8.5cm; /* Lebar dikurangi dari 8.69 ke 8.5 */
+            height: 10.8cm; 
             border: 2px solid #000;
             background: white;
             display: flex;
@@ -115,8 +114,9 @@
             border-bottom: 1px solid #000;
             box-sizing: border-box;
         }
+        /* Foto: Lebar dikurangi (4.15 - 0.19 = 3.96cm) */
         .foto-container {
-            width: 4.15cm;
+            width: 3.96cm; 
             height: 100%;
             display: flex;
             justify-content: center;
@@ -139,6 +139,7 @@
             height: 100%;
             object-fit: cover;
         }
+        /* QR: Lebar Tetap (4.54cm) */
         .qr-container {
             width: 4.54cm;
             height: 100%;
@@ -171,15 +172,15 @@
         }
 
         /* --- C. NAMA (1.2 cm) --- */
+        /* Lebar mengikuti kartu (8.5cm) */
         .nama-container {
-            width: 8.69cm;
+            width: 100%; 
             height: 1.2cm;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             border-bottom: 1px solid #000;
-            
             font-family: 'Arial Narrow', Arial, sans-serif;
             font-weight: bold;
             font-size: 12pt;
@@ -188,10 +189,10 @@
             box-sizing: border-box;
         }
 
-        /* --- D. TABEL DATA (Sisa Tinggi) --- */
+        /* --- D. TABEL DATA --- */
         .table-container {
-            width: 8.69cm;
-            flex: 1; /* Mengisi sisa ruang tinggi kartu */
+            width: 100%;
+            flex: 1;
             box-sizing: border-box;
         }
         table {
@@ -201,7 +202,7 @@
             font-family: Arial, sans-serif;
             font-size: 10pt;
         }
-        /* Hapus border luar agar clean */
+        /* Hapus border double */
         table tr td:first-child { border-left: none; }
         table tr td:last-child { border-right: none; }
         table tr:last-child td { border-bottom: none; }
@@ -213,16 +214,16 @@
             box-sizing: border-box;
         }
         .col-label { width: 3.1cm; }
-        .col-val { width: 5.5cm; text-transform: uppercase; }
+        /* Placeholder value dikurangi lebar */
+        .col-val { width: 5.4cm; text-transform: uppercase; }
 
-        /* Print Mode */
         @media print {
             body { background-color: white; }
             .page-container {
                 margin: 0;
                 box-shadow: none;
                 border: none;
-                height: 100vh; /* Full Height untuk Print */
+                height: 100vh;
             }
             #loading { display: none; }
         }
@@ -231,7 +232,7 @@
 <body>
 
     <div id="loading" style="text-align: center; margin-top: 50px;">
-        <h3>Memuat Data (F4 Mode)...</h3>
+        <h3>Memuat Data...</h3>
     </div>
     <div id="main-output"></div>
 
@@ -243,6 +244,47 @@
 
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
+
+        // --- Helper: Format Title Case (DEMAK -> Demak) ---
+        function toTitleCase(str) {
+            return str.replace(/\w\S*/g, function(txt){
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+
+        // --- Helper: Format Tanggal (15/11/2011 -> 15 Nov 2011) ---
+        function formatTanggalIndo(dateStr) {
+            if (!dateStr) return '';
+            
+            // Mapping Bulan Pendek
+            const bulanIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            // Cek format umum dd/mm/yyyy atau yyyy-mm-dd
+            let d, m, y;
+            
+            // Regex untuk dd/mm/yyyy atau dd-mm-yyyy
+            const matchSlash = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            if (matchSlash) {
+                d = parseInt(matchSlash[1]);
+                m = parseInt(matchSlash[2]) - 1; // Index array mulai 0
+                y = matchSlash[3];
+            } else {
+                // Coba parse date standar
+                const dateObj = new Date(dateStr);
+                if (!isNaN(dateObj)) {
+                    d = dateObj.getDate();
+                    m = dateObj.getMonth();
+                    y = dateObj.getFullYear();
+                } else {
+                    return dateStr; // Jika format tidak dikenali, kembalikan aslinya
+                }
+            }
+
+            if (m >= 0 && m < 12) {
+                return `${d} ${bulanIndo[m]} ${y}`;
+            }
+            return dateStr;
+        }
 
         function getDirectDriveUrl(url) {
             if (!url) return '';
@@ -279,7 +321,6 @@
                 allParticipants.push(p);
             }
 
-            // --- SETTING F4: 6 KARTU PER HALAMAN ---
             const ITEMS_PER_PAGE = 6; 
             let currentPageDiv = createNewPage();
 
@@ -316,12 +357,23 @@
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
             const LEMBAGA = (data['Asal Lembaga / TPQ'] || '-');
-            const TTL = (data['Tempat Lahir'] || '') + ', ' + (data['Tanggal Lahir'] || '');
             const BIN = (data['Nama Ayah'] || '-').toUpperCase();
             const BINTI = (data['Nama Ibu'] || '-').toUpperCase();
-            
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
+
+            // --- FORMATTING TTL ---
+            // 1. Ambil data mentah
+            const rawTempat = data['Tempat Lahir'] || '';
+            const rawTanggal = data['Tanggal Lahir'] || '';
+            
+            // 2. Format
+            const tempatFormatted = toTitleCase(rawTempat); // DEMAK -> Demak
+            const tanggalFormatted = formatTanggalIndo(rawTanggal); // 15/11/2011 -> 15 Nov 2011
+            
+            // 3. Gabung
+            const TTL = (tempatFormatted && tanggalFormatted) ? `${tempatFormatted}, ${tanggalFormatted}` : '-';
+
 
             card.innerHTML = `
                 <div class="header">

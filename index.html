@@ -1,236 +1,13 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (QR Code)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <style>
-        /* ================================================= */
-        /* 1. Page Setup (A4 Portrait) */
-        /* ================================================= */
-        @page {
-            size: A4 portrait;
-            margin: 1cm;
-        }
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #eee;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        /* ================================================= */
-        /* 2. Grid Container (2 Kolom x 2 Baris = 4 Kartu) */
-        /* ================================================= */
-        .page-container {
-            background-color: white;
-            width: 21cm;
-            height: 29.7cm;
-            padding: 1cm;
-            margin: 20px auto;
-            box-sizing: border-box;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr; 
-            /* Mengatur posisi agar kartu ada di tengah grid cell */
-            justify-items: center; 
-            align-items: start;
-            gap: 10px;
-            
-            page-break-after: always;
-        }
-
-        /* ================================================= */
-        /* 3. Desain Kartu (8.6cm x 10.8cm) */
-        /* ================================================= */
-        .kartu-peserta {
-            width: 8.6cm;
-            height: 10.8cm;
-            border: 2px solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* --- HEADER --- */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 5px;
-            border-bottom: 3px double #000; /* Garis Ganda */
-            height: 1.8cm;
-        }
-        .logo-box {
-            width: 1.5cm;
-            height: 1.5cm;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .logo-box img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        .title-box {
-            flex: 1;
-            text-align: center;
-            font-weight: bold;
-            font-size: 9pt;
-            line-height: 1.1;
-            padding: 0 2px;
-        }
-        .nomor-urut-box {
-            width: 1.2cm;
-            height: 0.8cm;
-            background-color: #FFD700; /* Kuning Emas */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14pt;
-            font-family: 'Courier New', Courier, monospace; /* Font Digital look */
-            border: 1px solid #000; /* Opsional: tambah border kotak */
-        }
-
-        /* --- BODY UTAMA (Foto & QR) --- */
-        .body-upper {
-            display: flex;
-            height: 4.2cm; /* Area Foto dan QR */
-            border-bottom: 1px solid #000;
-        }
-        
-        /* Kiri: Foto */
-        .foto-container {
-            width: 55%;
-            padding: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-right: 1px solid #000;
-        }
-        .foto-box {
-            width: 3cm;
-            height: 4cm;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .foto-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Kanan: QR Code */
-        .qr-container {
-            width: 45%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2px;
-        }
-        .scan-text {
-            color: #007bff; /* Biru seperti contoh */
-            font-size: 8pt;
-            font-weight: bold;
-            margin-bottom: 2px;
-            text-decoration: underline wavy red; /* Efek garis merah bergelombang */
-        }
-        .qr-canvas {
-            width: 2.2cm;
-            height: 2.2cm;
-        }
-        .qr-canvas img {
-            width: 100%; /* Pastikan QR fit */
-        }
-        .id-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 9pt;
-            margin-top: 2px;
-        }
-
-        /* --- NAMA PESERTA --- */
-        .nama-container {
-            text-align: center;
-            padding: 5px 2px;
-            border-bottom: 1px solid #000;
-            font-weight: bold;
-            font-size: 10pt;
-            text-transform: uppercase;
-            background-color: #fff;
-        }
-
-        /* --- TABEL DATA --- */
-        .table-container {
-            flex: 1;
-            padding: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8.5pt;
-        }
-        td {
-            border: 1px solid #000;
-            padding: 3px 5px;
-            vertical-align: middle;
-        }
-        .col-label {
-            width: 32%; /* Lebar kolom label */
-            background-color: #fff;
-        }
-        .col-val {
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        /* ================================================= */
-        /* 4. Print Mode */
-        /* ================================================= */
-        @media print {
-            body { background-color: white; }
-            .page-container {
-                margin: 0;
-                box-shadow: none;
-                border: none;
-                height: auto;
-            }
-            #loading { display: none; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="loading" style="text-align: center; margin-top: 50px;">
-        <h3>Memuat Data & Generate QR Code...</h3>
-    </div>
-    <div id="main-output"></div>
-
-    <script>
+<script>
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form Responses 1`; 
         
+        // --- PENGATURAN LOGO (Cukup ubah di sini saja) ---
+        // Pastikan nama file ini SAMA PERSIS dengan yang diupload di GitHub (huruf besar/kecil)
+        const LOGO_FILENAME = "QIRAATI.png"; 
+
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
-
-        // URL Logo Qiroati (Ganti dengan URL logo asli Anda jika ada)
-        // Saya menggunakan placeholder icon Qiroati kuning sementara
-        const LOGO_URL = "QIRAATI.png"; 
-        // NOTE: Ganti URL di atas dengan link logo Qiroati yang benar.
 
         function getDirectDriveUrl(url) {
             if (!url) return '';
@@ -267,10 +44,8 @@
                 allParticipants.push(p);
             }
 
-            // PAGINATION: 4 KARTU (2x2) PER HALAMAN A4
             const ITEMS_PER_PAGE = 4;
             let currentPageDiv = createNewPage();
-            let cardCount = 0;
 
             allParticipants.forEach((data, index) => {
                 if (index > 0 && index % ITEMS_PER_PAGE === 0) {
@@ -278,12 +53,11 @@
                     currentPageDiv = createNewPage();
                 }
                 
-                // Buat Elemen Kartu
+                // Panggil fungsi pembuatan kartu
                 const cardElement = createCardHTML(data, index);
                 currentPageDiv.appendChild(cardElement);
 
-                // GENERATE QR CODE (Setelah elemen masuk ke DOM)
-                // Kita beri jeda sedikit agar element render dulu
+                // Generate QR Code
                 setTimeout(() => {
                     generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`);
                 }, 10);
@@ -304,8 +78,7 @@
             const card = document.createElement('div');
             card.className = 'kartu-peserta';
 
-            // Data Mapping
-            const NO_URUT = String(data['NO']).padStart(3, '0'); // Format 001, 022
+            const NO_URUT = String(data['NO']).padStart(3, '0');
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
             const LEMBAGA = (data['Asal Lembaga / TPQ'] || '-');
@@ -316,14 +89,13 @@
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
 
-            // Ganti URL logo di bawah ini dengan logo Qiroati yang valid
-            // Saya pakai teks placeholder logo jika gambar error
-            const LOGO_SRC = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7zS4PqVvCgMvCgMvCgMvCgMvCgMvCgMvCgMvCg/s1600/Logo%20Qiroati.png"; // Contoh placeholder
+            // SAYA MENGHAPUS VARIABEL LAMA DI SINI
+            // Sekarang langsung memakai LOGO_FILENAME yang dari atas
 
             card.innerHTML = `
                 <div class="header">
                     <div class="logo-box">
-                        <img src="${LOGO_SRC}" alt="Logo" onerror="this.style.display='none'">
+                        <img src="${LOGO_FILENAME}" alt="Logo" onerror="this.style.display='none'">
                     </div>
                     <div class="title-box">
                         EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)
@@ -374,16 +146,13 @@
             return card;
         }
 
-        // Fungsi Helper Library QR Code
         function generateQRCode(text, elementId) {
             const el = document.getElementById(elementId);
             if(el) {
-                // Bersihkan isi div dulu (jaga-jaga)
                 el.innerHTML = "";
-                // Buat QR
                 new QRCode(el, {
                     text: text || "NO DATA",
-                    width: 75,  // Ukuran QR dalam Pixel
+                    width: 75,
                     height: 75,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
@@ -394,5 +163,3 @@
 
         fetchSheetData();
     </script>
-</body>
-</html>

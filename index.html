@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (QR Code)</title>
+    <title>Cetak Kartu EBTAQ Presisi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -24,7 +24,7 @@
         }
 
         /* ================================================= */
-        /* 2. Grid Container (2 Kolom x 2 Baris = 4 Kartu) */
+        /* 2. Grid Container (2x2 = 4 Kartu) */
         /* ================================================= */
         .page-container {
             background-color: white;
@@ -33,12 +33,10 @@
             padding: 1cm;
             margin: 20px auto;
             box-sizing: border-box;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
             
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr; 
-            /* Mengatur posisi agar kartu ada di tengah grid cell */
             justify-items: center; 
             align-items: start;
             gap: 10px;
@@ -47,12 +45,13 @@
         }
 
         /* ================================================= */
-        /* 3. Desain Kartu (8.6cm x 10.8cm) */
+        /* 3. Desain Kartu (Lebar Total 8.69 cm) */
         /* ================================================= */
         .kartu-peserta {
-            width: 8.6cm;
-            height: 10.8cm;
-            border: 2px solid #000;
+            width: 8.69cm; /* Sesuai instruksi */
+            /* Tinggi total otomatis mengikuti konten atau bisa diset fixed */
+            /* height: 10.8cm; (Opsional, jika ingin tinggi fix) */
+            border: 1px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
@@ -61,71 +60,80 @@
             overflow: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- A. HEADER --- */
+        /* Tinggi 1.43 cm, Lebar 8.69 cm */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 5px;
-            border-bottom: 3px double #000; /* Garis Ganda */
-            height: 1.8cm;
+            height: 1.43cm;
+            border-bottom: 3px double #000;
+            padding: 0 2px;
+            box-sizing: border-box;
         }
         .logo-box {
-            width: 1.5cm;
-            height: 1.5cm;
+            /* Area Logo (Kiri) - Estimasi agar proporsional */
+            width: 1.3cm; 
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .logo-box img {
+            max-height: 90%;
             max-width: 100%;
-            max-height: 100%;
         }
         .title-box {
+            /* Judul (Tengah) */
             flex: 1;
             text-align: center;
+            font-family: 'Times New Roman', Times, serif; /* TNR */
             font-weight: bold;
-            font-size: 9pt;
+            font-size: 10pt; /* Ukuran 10 */
             line-height: 1.1;
-            padding: 0 2px;
         }
         .nomor-urut-box {
-            width: 1.2cm;
-            height: 0.8cm;
-            background-color: #FFD700; /* Kuning Emas */
+            /* Nomor (Kanan) */
+            width: 1.3cm; /* Estimasi agar muat 3 digit */
+            height: 80%;
+            background-color: #FFC000; /* Warna Sorotan */
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14pt;
-            font-family: 'Courier New', Courier, monospace; /* Font Digital look */
-            border: 1px solid #000; /* Opsional: tambah border kotak */
+            font-size: 12pt;
+            font-family: 'OCR-A BT', 'Courier New', Courier, monospace; /* OCR-A BT */
+            border: 1px solid #000; /* Opsional, agar rapi */
         }
 
-        /* --- BODY UTAMA (Foto & QR) --- */
+        /* --- B. BODY ATAS (FOTO & QR) --- */
+        /* Tinggi 5 cm */
         .body-upper {
             display: flex;
-            height: 4.2cm; /* Area Foto dan QR */
+            height: 5.0cm;
             border-bottom: 1px solid #000;
+            box-sizing: border-box;
         }
         
-        /* Kiri: Foto */
+        /* Kiri: Foto (Lebar 4.15 cm) */
         .foto-container {
-            width: 55%;
-            padding: 5px;
+            width: 4.15cm;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             border-right: 1px solid #000;
+            box-sizing: border-box;
         }
         .foto-box {
-            width: 3cm;
+            width: 3cm;  /* Ukuran Foto 3x4 */
             height: 4cm;
             background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            border: 1px solid #ccc;
         }
         .foto-box img {
             width: 100%;
@@ -133,74 +141,92 @@
             object-fit: cover;
         }
 
-        /* Kanan: QR Code */
+        /* Kanan: QR (Lebar 4.54 cm) */
         .qr-container {
-            width: 45%;
+            width: 4.54cm;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 2px;
+            justify-content: start; /* Mulai dari atas */
+            padding-top: 5px; 
+            box-sizing: border-box;
         }
         .scan-text {
-            color: #007bff; /* Biru seperti contoh */
-            font-size: 8pt;
-            font-weight: bold;
-            margin-bottom: 2px;
-            text-decoration: underline wavy red; /* Efek garis merah bergelombang */
+            color: #007bff;
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            text-decoration: underline;
+            margin-bottom: 1.2em; /* Jarak 1 enter (approx) */
         }
         .qr-canvas {
-            width: 2.2cm;
-            height: 2.2cm;
+            /* Ukuran QR 3.2 cm */
+            width: 3.2cm;
+            height: 3.2cm;
+            display: flex;
+            justify-content: center;
         }
         .qr-canvas img {
-            width: 100%; /* Pastikan QR fit */
+            width: 100%;
         }
         .id-text {
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
-            font-size: 9pt;
-            margin-top: 2px;
-        }
-
-        /* --- NAMA PESERTA --- */
-        .nama-container {
-            text-align: center;
-            padding: 5px 2px;
-            border-bottom: 1px solid #000;
-            font-weight: bold;
             font-size: 10pt;
-            text-transform: uppercase;
-            background-color: #fff;
+            margin-top: auto; /* Auto spacing (dorong ke bawah/tengah sisa ruang) */
+            margin-bottom: 5px;
         }
 
-        /* --- TABEL DATA --- */
+        /* --- C. BODY BAWAH (NAMA) --- */
+        /* Tinggi 1.2 cm, Lebar 8.69 cm */
+        .nama-container {
+            width: 8.69cm;
+            height: 1.2cm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            
+            font-family: 'Arial Narrow', Arial, sans-serif;
+            font-weight: bold;
+            font-size: 12pt;
+            text-transform: uppercase;
+            padding: 0 5px;
+            box-sizing: border-box;
+        }
+
+        /* --- D. TABEL DATA --- */
         .table-container {
-            flex: 1;
-            padding: 0;
+            width: 8.69cm;
+            box-sizing: border-box;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.5pt;
+            font-family: Arial, sans-serif; /* Arial Body */
+            font-size: 10pt; /* Ukuran 10 */
+        }
+        tr {
+            height: 0.7cm; /* Tinggi baris 0.7 cm */
         }
         td {
             border: 1px solid #000;
-            padding: 3px 5px;
+            padding: 0 5px;
             vertical-align: middle;
+            box-sizing: border-box;
         }
+        /* Kolom Label: Lebar 3.1 cm */
         .col-label {
-            width: 32%; /* Lebar kolom label */
-            background-color: #fff;
+            width: 3.1cm;
         }
+        /* Kolom Isi: Lebar 5.5 cm */
         .col-val {
-            font-weight: 500;
+            width: 5.5cm;
             text-transform: uppercase;
         }
 
-        /* ================================================= */
-        /* 4. Print Mode */
-        /* ================================================= */
+        /* Print Mode */
         @media print {
             body { background-color: white; }
             .page-container {
@@ -216,7 +242,7 @@
 <body>
 
     <div id="loading" style="text-align: center; margin-top: 50px;">
-        <h3>Memuat Data & Generate QR Code...</h3>
+        <h3>Memuat Data...</h3>
     </div>
     <div id="main-output"></div>
 
@@ -224,12 +250,11 @@
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form Responses 1`; 
         
+        // --- LOGO: Pastikan file ini ada di GitHub ---
+        const LOGO_FILENAME = "Qiraati.png"; 
+
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
-
-        // --- BAGIAN INI SUDAH DIPERBAIKI ---
-        // Pastikan file "Qiraati.png" ada di folder yang sama di GitHub
-        const LOGO_FILENAME = "QIRAATI.png"; 
 
         function getDirectDriveUrl(url) {
             if (!url) return '';
@@ -266,10 +291,9 @@
                 allParticipants.push(p);
             }
 
-            // PAGINATION: 4 KARTU (2x2) PER HALAMAN A4
+            // 4 KARTU PER HALAMAN
             const ITEMS_PER_PAGE = 4;
             let currentPageDiv = createNewPage();
-            let cardCount = 0;
 
             allParticipants.forEach((data, index) => {
                 if (index > 0 && index % ITEMS_PER_PAGE === 0) {
@@ -277,11 +301,10 @@
                     currentPageDiv = createNewPage();
                 }
                 
-                // Buat Elemen Kartu
                 const cardElement = createCardHTML(data, index);
                 currentPageDiv.appendChild(cardElement);
 
-                // GENERATE QR CODE
+                // Generate QR
                 setTimeout(() => {
                     generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`);
                 }, 10);
@@ -302,7 +325,7 @@
             const card = document.createElement('div');
             card.className = 'kartu-peserta';
 
-            // Data Mapping
+            // Mapping Data
             const NO_URUT = String(data['NO']).padStart(3, '0');
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
@@ -314,8 +337,6 @@
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
 
-            // --- PERBAIKAN: Gunakan LOGO_FILENAME langsung, hapus LOGO_SRC lokal ---
-            
             card.innerHTML = `
                 <div class="header">
                     <div class="logo-box">
@@ -370,15 +391,15 @@
             return card;
         }
 
-        // Fungsi Helper Library QR Code
         function generateQRCode(text, elementId) {
             const el = document.getElementById(elementId);
             if(el) {
                 el.innerHTML = "";
+                // Generate QR dengan ukuran sesuai container (3.2cm ~ 120px)
                 new QRCode(el, {
                     text: text || "NO DATA",
-                    width: 75,
-                    height: 75,
+                    width: 120, 
+                    height: 120,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.H
@@ -390,4 +411,3 @@
     </script>
 </body>
 </html>
-

@@ -367,7 +367,7 @@
             const card = document.createElement('div');
             card.className = 'kartu-peserta';
 
-            const NO_URUT = String(data['NO']).padStart(3, '0');
+            const NO_URUT = String(data['NOMOR']).padStart(3, '0');
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
             const LEMBAGA = (data['Asal Lembaga / TPQ'] || '-');
@@ -455,4 +455,5 @@
     </script>
 </body>
 </html>
+
 

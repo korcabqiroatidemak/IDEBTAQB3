@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (Fix Background Print)</title>
+    <title>Cetak Kartu EBTAQ (Page Label Added)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -21,6 +21,21 @@
             min-height: 100vh;
         }
 
+        /* --- TAMBAHAN: LABEL HALAMAN (Hanya di Layar) --- */
+        .page-label {
+            display: inline-block;
+            background-color: #222;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px; /* Nempel dengan kertas */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
         /* Container Kertas F4 Visual */
         .page-container {
             background-color: white;
@@ -29,8 +44,9 @@
             width: 215mm; 
             height: 330mm; 
             
-            /* POSISI DI LAYAR: Center */
-            margin-bottom: 30px; 
+            /* MODIFIKASI: Margin Auto agar rapi di tengah */
+            margin: 0 auto 15px auto; 
+            
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             box-sizing: border-box;
             
@@ -46,9 +62,10 @@
             
             /* GAP */
             column-gap: 10mm;
-            row-gap: 1px;     
+            row-gap: 1px;      
             
             page-break-after: always;
+            position: relative; /* Penting untuk cut-line */
         }
 
         /* ================================================= */
@@ -56,7 +73,7 @@
         /* ================================================= */
         @page {
             size: 215mm 330mm; 
-            margin: 0;         
+            margin: 0;          
         }
 
         @media print {
@@ -65,12 +82,12 @@
                 padding: 0;
                 display: block; 
             }
+            
+            /* Sembunyikan Label Halaman saat Print */
+            .page-label { display: none !important; }
+
             .page-container {
-                /* Perhitungan Manual Margin Kiri: (215 - 180) / 2 = 17.5mm */
-                /* margin-left: 17.5mm !important; */
-                
-                margin-top: 0;
-                margin-bottom: 0;
+                margin: 0;
                 box-shadow: none;
                 border: none;
                 page-break-after: always;
@@ -80,8 +97,8 @@
             /* --- PERBAIKAN: PAKSA WARNA BACKGROUND TERCETAK --- */
             .nomor-urut-box {
                 background-color: #FFC000 !important; /* Paksa Kuning */
-                -webkit-print-color-adjust: exact !important; /* Chrome/Safari/Edge */
-                print-color-adjust: exact !important;         /* Firefox */
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;         
                 color-adjust: exact !important;
             }
         }
@@ -141,8 +158,6 @@
             font-size: 12pt;
             font-family: 'OCR-A BT', 'Courier New', Courier, monospace;
             border: 1px solid #000;
-            
-            /* Tambahan agar di layar juga konsisten settingannya */
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
@@ -337,11 +352,18 @@
             }
 
             const ITEMS_PER_PAGE = 6; 
+            
+            // --- TAMBAHAN LOGIKA HALAMAN ---
+            const totalPages = Math.ceil(allParticipants.length / ITEMS_PER_PAGE);
             let currentPageDiv = createNewPage();
+            let pageIndex = 1;
 
             allParticipants.forEach((data, index) => {
                 if (index > 0 && index % ITEMS_PER_PAGE === 0) {
-                    mainOutput.appendChild(currentPageDiv);
+                    // Masukkan halaman sebelumnya + Labelnya
+                    appendPageWithLabel(currentPageDiv, pageIndex, totalPages);
+                    
+                    pageIndex++;
                     currentPageDiv = createNewPage();
                 }
                 
@@ -353,9 +375,20 @@
                 }, 10);
             });
 
+            // Masukkan halaman terakhir jika ada isinya
             if (currentPageDiv.hasChildNodes()) {
-                mainOutput.appendChild(currentPageDiv);
+                appendPageWithLabel(currentPageDiv, pageIndex, totalPages);
             }
+        }
+
+        // --- FUNGSI BARU UNTUK LABEL HALAMAN ---
+        function appendPageWithLabel(container, current, total) {
+            const label = document.createElement('div');
+            label.className = 'page-label';
+            label.innerText = `HALAMAN ${current} DARI ${total}`;
+            
+            mainOutput.appendChild(label);
+            mainOutput.appendChild(container);
         }
 
         function createNewPage() {
@@ -456,6 +489,3 @@
     </script>
 </body>
 </html>
-
-
-

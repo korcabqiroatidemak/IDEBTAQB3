@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Kartu EBTAQ (Page Label Added)</title>
+    <title>Cetak Kartu Peserta (Label Center Fix)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -15,15 +15,20 @@
             background-color: #525659;
             margin: 0;
             padding: 20px 0;
+            
+            /* Mengatur posisi elemen di tengah layar */
             display: flex;
             flex-direction: column;
             align-items: center; 
             min-height: 100vh;
+            
+            /* PERBAIKAN: Memastikan teks (label) rata tengah */
+            text-align: center; 
         }
 
-        /* --- TAMBAHAN: LABEL HALAMAN (Hanya di Layar) --- */
+        /* LABEL HALAMAN */
         .page-label {
-            display: inline-block;
+            display: inline-block; /* Agar nurut sama text-align center */
             background-color: #222;
             color: #fff;
             padding: 4px 12px;
@@ -31,72 +36,48 @@
             font-size: 13px;
             font-weight: bold;
             margin-top: 10px;
-            margin-bottom: 5px; /* Nempel dengan kertas */
+            margin-bottom: 5px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             z-index: 10;
         }
 
-        /* Container Kertas F4 Visual */
+        /* Container Kertas F4 */
         .page-container {
             background-color: white;
-            
-            /* LEBAR KONTEN PAS (180mm) */
             width: 215mm; 
             height: 330mm; 
-            
-            /* MODIFIKASI: Margin Auto agar rapi di tengah */
-            margin: 0 auto 15px auto; 
-            
+            margin: 0 auto 15px auto; /* Margin Auto menjaga kertas tetap di tengah */
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             box-sizing: border-box;
             
-            /* GRID LAYOUT */
             display: grid;
             grid-template-columns: 85mm 85mm; 
             grid-template-rows: repeat(3, auto);
-            
-            /* Center Content */
             justify-content: center;
             align-content: start;
             padding-top: 3mm;
-            
-            /* GAP */
             column-gap: 10mm;
             row-gap: 1px;      
             
             page-break-after: always;
-            position: relative; /* Penting untuk cut-line */
+            position: relative;
+            
+            /* Reset text align di dalam kertas agar isi kartu tidak ikut ke tengah */
+            text-align: left; 
         }
 
         /* ================================================= */
-        /* 2. TAMPILAN CETAK (PRINT VIEW - Ctrl+P)           */
+        /* 2. TAMPILAN CETAK (PRINT VIEW)                    */
         /* ================================================= */
-        @page {
-            size: 215mm 330mm; 
-            margin: 0;          
-        }
+        @page { size: 215mm 330mm; margin: 0; }
 
         @media print {
-            body {
-                background-color: white;
-                padding: 0;
-                display: block; 
-            }
-            
-            /* Sembunyikan Label Halaman saat Print */
+            body { background-color: white; padding: 0; display: block; text-align: left; }
             .page-label { display: none !important; }
-
-            .page-container {
-                margin: 0;
-                box-shadow: none;
-                border: none;
-                page-break-after: always;
-            }
+            .page-container { margin: 0; box-shadow: none; border: none; page-break-after: always; }
             #loading { display: none; }
-
-            /* --- PERBAIKAN: PAKSA WARNA BACKGROUND TERCETAK --- */
             .nomor-urut-box {
-                background-color: #FFC000 !important; /* Paksa Kuning */
+                background-color: #FFC000 !important;
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important;         
                 color-adjust: exact !important;
@@ -107,166 +88,50 @@
         /* 3. DESAIN KARTU                                   */
         /* ================================================= */
         .kartu-peserta {
-            width: 85mm; 
-            height: 108mm; 
-            border: 2px solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
+            width: 85mm; height: 108mm; 
+            border: 2px solid #000; background: white;
+            display: flex; flex-direction: column;
+            box-sizing: border-box; position: relative; overflow: hidden;
         }
-
-        /* --- A. HEADER --- */
+        /* A. HEADER */
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 14.3mm;
-            border-bottom: 3px double #000;
-            padding: 0 2px;
-            box-sizing: border-box;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 14.3mm; border-bottom: 3px double #000; padding: 0 2px; box-sizing: border-box;
         }
-        .logo-box {
-            width: 13mm; 
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .logo-box img {
-            max-height: 90%;
-            max-width: 100%;
-        }
-        .title-box {
-            flex: 1;
-            text-align: center;
-            font-family: 'Times New Roman', Times, serif;
-            font-weight: bold;
-            font-size: 10pt;
-            line-height: 1.1;
-        }
+        .logo-box { width: 13mm; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .logo-box img { max-height: 90%; max-width: 100%; }
+        .title-box { flex: 1; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; font-size: 10pt; line-height: 1.1; }
         .nomor-urut-box {
-            width: 13mm;
-            height: 80%;
-            background-color: #FFC000; /* Warna Kuning Default */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 12pt;
-            font-family: 'OCR-A BT', 'Courier New', Courier, monospace;
-            border: 1px solid #000;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            width: 13mm; height: 80%; background-color: #FFC000;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 12pt; font-family: 'OCR-A BT', 'Courier New', Courier, monospace;
+            border: 1px solid #000; -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
-
-        /* --- B. BODY ATAS --- */
-        .body-upper {
-            display: flex;
-            height: 53mm; 
-            border-bottom: 1px solid #000;
-            box-sizing: border-box;
-        }
-        .foto-container {
-            width: 39.6mm; 
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-right: 1px solid #000;
-            box-sizing: border-box;
-        }
-        .foto-box {
-            width: 30mm;
-            height: 40mm;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 1px solid #ccc;
-        }
-        .foto-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .qr-container {
-            width: 45.4mm;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: start;
-            padding-top: 5px; 
-            box-sizing: border-box;
-        }
-        .scan-text {
-            color: #007bff;
-            font-family: Arial, sans-serif;
-            font-size: 9pt;
-            text-decoration: underline;
-            margin-bottom: 1.2em;
-        }
-        .qr-canvas {
-            width: 32mm;
-            height: 32mm;
-            display: flex;
-            justify-content: center;
-        }
-        .id-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 10pt;
-            margin-top: auto;
-            margin-bottom: 5px;
-        }
-
-        /* --- C. NAMA --- */
+        /* B. BODY ATAS */
+        .body-upper { display: flex; height: 53mm; border-bottom: 1px solid #000; box-sizing: border-box; }
+        .foto-container { width: 39.6mm; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; box-sizing: border-box; }
+        .foto-box { width: 30mm; height: 40mm; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ccc; }
+        .foto-box img { width: 100%; height: 100%; object-fit: cover; }
+        .qr-container { width: 45.4mm; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: start; padding-top: 5px; box-sizing: border-box; }
+        .scan-text { color: #007bff; font-family: Arial, sans-serif; font-size: 9pt; text-decoration: underline; margin-bottom: 1.2em; }
+        .qr-canvas { width: 32mm; height: 32mm; display: flex; justify-content: center; }
+        .id-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 10pt; margin-top: auto; margin-bottom: 5px; }
+        /* C. NAMA */
         .nama-container {
-            width: 100%;
-            height: 12mm;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            border-bottom: 1px solid #000;
-            font-family: 'Arial Narrow', Arial, sans-serif;
-            font-weight: bold;
-            font-size: 12pt;
-            text-transform: uppercase;
-            padding: 0 5px;
-            box-sizing: border-box;
+            width: 100%; height: 12mm; display: flex; align-items: center; justify-content: center;
+            text-align: center; border-bottom: 1px solid #000;
+            font-family: 'Arial Narrow', Arial, sans-serif; font-weight: bold; font-size: 12pt;
+            text-transform: uppercase; padding: 0 5px; box-sizing: border-box;
         }
-
-        /* --- D. TABEL DATA --- */
-        .table-container {
-            width: 100%;
-            flex: 1;
-            box-sizing: border-box;
-        }
-        table {
-            width: 100%;
-            height: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-            font-size: 10pt;
-        }
+        /* D. TABEL DATA */
+        .table-container { width: 100%; flex: 1; box-sizing: border-box; }
+        table { width: 100%; height: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
         table tr td:first-child { border-left: none; }
         table tr td:last-child { border-right: none; }
         table tr:last-child td { border-bottom: none; }
-
-        td {
-            border: 1px solid #000;
-            padding: 0 5px;
-            vertical-align: middle;
-            box-sizing: border-box;
-        }
-        .col-label { width: 31mm; }
-        .col-val { width: 54mm; text-transform: uppercase; }
-
+        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; box-sizing: border-box; }
+        .col-label { width: 31mm; text-align: left; }
+        .col-val { width: 54mm; text-transform: uppercase; text-align: left; }
     </style>
 </head>
 <body>
@@ -279,43 +144,24 @@
     <script>
         const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Biodata Cek`; 
-        
         const LOGO_FILENAME = "QIRAATI.png"; 
 
         const mainOutput = document.getElementById('main-output');
         const loading = document.getElementById('loading');
 
         function toTitleCase(str) {
-            return str.replace(/\w\S*/g, function(txt){
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
+            return str.replace(/\w\S*/g, function(txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
         }
-
         function formatTanggalIndo(dateStr) {
             if (!dateStr) return '';
             const bulanIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             let d, m, y;
             const matchSlash = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-            if (matchSlash) {
-                d = parseInt(matchSlash[1]);
-                m = parseInt(matchSlash[2]) - 1;
-                y = matchSlash[3];
-            } else {
-                const dateObj = new Date(dateStr);
-                if (!isNaN(dateObj)) {
-                    d = dateObj.getDate();
-                    m = dateObj.getMonth();
-                    y = dateObj.getFullYear();
-                } else {
-                    return dateStr;
-                }
-            }
-            if (m >= 0 && m < 12) {
-                return `${d} ${bulanIndo[m]} ${y}`;
-            }
+            if (matchSlash) { d = parseInt(matchSlash[1]); m = parseInt(matchSlash[2]) - 1; y = matchSlash[3]; } 
+            else { const dateObj = new Date(dateStr); if (!isNaN(dateObj)) { d = dateObj.getDate(); m = dateObj.getMonth(); y = dateObj.getFullYear(); } else { return dateStr; } }
+            if (m >= 0 && m < 12) { return `${d} ${bulanIndo[m]} ${y}`; }
             return dateStr;
         }
-
         function getDirectDriveUrl(url) {
             if (!url) return '';
             const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -338,55 +184,40 @@
         function processCSV(csvText) {
             const rows = csvText.trim().split('\n').filter(r => r.trim().length > 0);
             if (rows.length < 2) return;
-
             const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
             const allParticipants = [];
-
             for (let i = 1; i < rows.length; i++) {
                 const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
                 let p = { 'NO': i + 1 };
-                rowData.forEach((val, idx) => {
-                    p[headers[idx]] = val ? val.trim().replace(/"/g, '') : '';
-                });
+                rowData.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
                 allParticipants.push(p);
             }
 
             const ITEMS_PER_PAGE = 6; 
-            
-            // --- TAMBAHAN LOGIKA HALAMAN ---
             const totalPages = Math.ceil(allParticipants.length / ITEMS_PER_PAGE);
             let currentPageDiv = createNewPage();
             let pageIndex = 1;
 
             allParticipants.forEach((data, index) => {
                 if (index > 0 && index % ITEMS_PER_PAGE === 0) {
-                    // Masukkan halaman sebelumnya + Labelnya
                     appendPageWithLabel(currentPageDiv, pageIndex, totalPages);
-                    
                     pageIndex++;
                     currentPageDiv = createNewPage();
                 }
-                
                 const cardElement = createCardHTML(data, index);
                 currentPageDiv.appendChild(cardElement);
-
-                setTimeout(() => {
-                    generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`);
-                }, 10);
+                setTimeout(() => { generateQRCode(data['ID Pendaftaran'], `qrcode-${index}`); }, 10);
             });
 
-            // Masukkan halaman terakhir jika ada isinya
             if (currentPageDiv.hasChildNodes()) {
                 appendPageWithLabel(currentPageDiv, pageIndex, totalPages);
             }
         }
 
-        // --- FUNGSI BARU UNTUK LABEL HALAMAN ---
         function appendPageWithLabel(container, current, total) {
             const label = document.createElement('div');
             label.className = 'page-label';
             label.innerText = `HALAMAN ${current} DARI ${total}`;
-            
             mainOutput.appendChild(label);
             mainOutput.appendChild(container);
         }
@@ -400,7 +231,6 @@
         function createCardHTML(data, index) {
             const card = document.createElement('div');
             card.className = 'kartu-peserta';
-
             const NO_URUT = String(data['NOMOR']).padStart(3, '0');
             const ABSEN = data['ID Pendaftaran'] || '-';
             const NAMA = (data['Nama Lengkap (Sesuai Akta)'] || '-').toUpperCase();
@@ -409,7 +239,6 @@
             const BINTI = (data['Nama Ibu'] || '-').toUpperCase();
             const rawFoto = data['Kirim Pas Foto Ukuran PostCard'] || '';
             const FOTO_URL = getDirectDriveUrl(rawFoto);
-
             const rawTempat = data['Tempat Lahir'] || '';
             const rawTanggal = data['Tanggal Lahir'] || '';
             const tempatFormatted = toTitleCase(rawTempat);
@@ -418,52 +247,21 @@
 
             card.innerHTML = `
                 <div class="header">
-                    <div class="logo-box">
-                        <img src="${LOGO_FILENAME}" alt="Logo" onerror="this.style.display='none'">
-                    </div>
-                    <div class="title-box">
-                        EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)
-                    </div>
-                    <div class="nomor-urut-box">
-                        ${NO_URUT}
-                    </div>
+                    <div class="logo-box"><img src="${LOGO_FILENAME}" alt="Logo" onerror="this.style.display='none'"></div>
+                    <div class="title-box">EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)</div>
+                    <div class="nomor-urut-box">${NO_URUT}</div>
                 </div>
-
                 <div class="body-upper">
-                    <div class="foto-container">
-                        <div class="foto-box">
-                            <img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'">
-                        </div>
-                    </div>
-                    <div class="qr-container">
-                        <div class="scan-text">Scan di sini!</div>
-                        <div id="qrcode-${index}" class="qr-canvas"></div>
-                        <div class="id-text">${ABSEN}</div>
-                    </div>
+                    <div class="foto-container"><div class="foto-box"><img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'"></div></div>
+                    <div class="qr-container"><div class="scan-text">Scan di sini!</div><div id="qrcode-${index}" class="qr-canvas"></div><div class="id-text">${ABSEN}</div></div>
                 </div>
-
-                <div class="nama-container">
-                    ${NAMA}
-                </div>
-
+                <div class="nama-container">${NAMA}</div>
                 <div class="table-container">
                     <table cellspacing="0">
-                        <tr>
-                            <td class="col-label">Tpt. Tgl. Lahir</td>
-                            <td class="col-val" style="text-transform: none;">${TTL}</td>
-                        </tr>
-                        <tr>
-                            <td class="col-label">Nama Ayah</td>
-                            <td class="col-val">${BIN}</td>
-                        </tr>
-                        <tr>
-                            <td class="col-label">Nama Ibu</td>
-                            <td class="col-val">${BINTI}</td>
-                        </tr>
-                        <tr>
-                            <td class="col-label">Lembaga / TKQ</td>
-                            <td class="col-val">${LEMBAGA}</td>
-                        </tr>
+                        <tr><td class="col-label">Tpt. Tgl. Lahir</td><td class="col-val" style="text-transform: none;">${TTL}</td></tr>
+                        <tr><td class="col-label">Nama Ayah</td><td class="col-val">${BIN}</td></tr>
+                        <tr><td class="col-label">Nama Ibu</td><td class="col-val">${BINTI}</td></tr>
+                        <tr><td class="col-label">Lembaga / TKQ</td><td class="col-val">${LEMBAGA}</td></tr>
                     </table>
                 </div>
             `;
@@ -474,17 +272,9 @@
             const el = document.getElementById(elementId);
             if(el) {
                 el.innerHTML = "";
-                new QRCode(el, {
-                    text: text || "NO DATA",
-                    width: 120, 
-                    height: 120,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
+                new QRCode(el, { text: text || "NO DATA", width: 120, height: 120, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
             }
         }
-
         fetchSheetData();
     </script>
 </body>

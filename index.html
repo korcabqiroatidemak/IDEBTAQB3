@@ -3,67 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu EBTAQ Final | Origin Logic</title>
+    <title>Kartu EBTAQ Final Hybrid | F4 Presisi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        /* --- TAMPILAN PANEL (FITRI) --- */
-        body { font-family: Arial, sans-serif; background-color: #525659; margin: 0; padding: 20px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .control-panel { background: #fff; width: 215mm; max-width: 95%; margin: 0 auto 20px auto; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,.3); text-align: left; box-sizing: border-box; }
-        #shift-container { border: 1px solid #ddd; padding: 8px; background: #fafafa; margin-bottom: 12px; display: flex; flex-flow: column wrap; height: 85px; overflow-x: auto; gap: 0 15px; align-content: flex-start; }
-        .cb-item { font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; height: 26px; min-width: 150px; flex-shrink: 0; white-space: nowrap; }
-        .btn-generate { width: 100%; padding: 12px; font-weight: bold; background: #28a745; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
-        .page-label { display: inline-block; background-color: #222; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 13px; margin-top: 10px; margin-bottom: 5px; }
+        /* ================================================= */
+        /* 1. TAMPILAN LAYAR (PANEL FITRI)                   */
+        /* ================================================= */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #525659; margin: 0; padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; text-align: center; 
+        }
+        .control-panel {
+            background: #fff; width: 215mm; max-width: 95%;
+            margin: 0 auto 20px auto; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.3); text-align: left;
+            box-sizing: border-box; border: 1px solid #ddd;
+        }
+        #shift-container {
+            border: 1px solid #ddd; padding: 8px; background: #fafafa; margin-bottom: 12px; 
+            display: flex; flex-flow: column wrap; height: 85px; 
+            overflow-x: auto; overflow-y: hidden; gap: 0 15px; 
+            align-content: flex-start;
+        }
+        #shift-container::-webkit-scrollbar { height: 6px; }
+        #shift-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .cb-item { 
+            font-size: 12px; cursor: pointer; display: flex; align-items: center; 
+            gap: 6px; height: 26px; min-width: 150px; flex-shrink: 0; white-space: nowrap;
+        }
+        .btn-generate { 
+            width: 100%; padding: 12px; font-weight: bold; font-size: 14px;
+            background: #28a745; color: #fff; border: none; 
+            cursor: pointer; border-radius: 4px; text-transform: uppercase;
+        }
+        .page-label {
+            display: inline-block; background-color: #222; color: #fff;
+            padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold;
+            margin-top: 10px; margin-bottom: 5px;
+        }
 
-        /* --- LAYOUT KERTAS (ORIGIN MODIFIED) --- */
+        /* ================================================= */
+        /* 2. LAYOUT KERTAS F4 (SETTING PRESISI)             */
+        /* ================================================= */
         .page-container {
-            background-color: white; width: 215mm; height: 330mm; margin: 0 auto 15px auto; box-sizing: border-box;
+            background-color: white; width: 215mm; height: 330mm; 
+            margin: 0 auto 15px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+            box-sizing: border-box;
             display: grid;
             grid-template-columns: 85mm 85mm; 
-            grid-template-rows: repeat(3, 107mm); /* Tinggi kartu 107mm */
-            justify-content: center; align-content: start;
-            padding-top: 4mm; /* Jarak aman atas 4mm */
+            grid-template-rows: repeat(3, 107mm); /* Tinggi kartu baru */
+            justify-content: center; 
+            align-content: start; 
+            padding-top: 4mm;     /* Margin aman printer */
             column-gap: 10mm; 
-            row-gap: 1px; /* Jarak antar kartu sesuai Origin */
-            page-break-after: always; position: relative; text-align: left; overflow: hidden;
+            row-gap: 1px;         /* Jarak antar baris untuk panduan potong */
+            page-break-after: always; position: relative; text-align: left; 
+            overflow: hidden;
         }
 
         @page { size: 215mm 330mm; margin: 0; }
+
         @media print {
-            body { background-color: white; padding: 0; }
+            body { background-color: white; padding: 0; display: block; text-align: left; }
             .control-panel, .page-label { display: none !important; }
-            .page-container { margin: 0; box-shadow: none; display: grid !important; }
-            .nomor-urut-box { background-color: #FFC000 !important; -webkit-print-color-adjust: exact; }
+            .page-container { margin: 0; box-shadow: none; border: none; display: grid !important; }
+            .nomor-urut-box {
+                background-color: #FFC000 !important;
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;         
+            }
         }
 
-        /* --- DESAIN KARTU (MURNI ORIGIN) --- */
-        .kartu-peserta { width: 85mm; height: 107mm; border: 2px solid #000; background: white; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
-        .header { display: flex; align-items: center; justify-content: space-between; height: 14.3mm; border-bottom: 3px double #000; padding: 0 2px; }
-        .logo-box { width: 13mm; display: flex; align-items: center; justify-content: center; }
+        /* ================================================= */
+        /* 3. DESAIN KARTU (ORIGIN STYLE - 107mm)            */
+        /* ================================================= */
+        .kartu-peserta {
+            width: 85mm; height: 107mm; /* Tinggi total kartu dikurangi */
+            border: 2px solid #000; background: white;
+            display: flex; flex-direction: column;
+            box-sizing: border-box; position: relative; overflow: hidden;
+        }
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 14.3mm; border-bottom: 3px double #000; padding: 0 2px; box-sizing: border-box;
+        }
+        .logo-box { width: 13mm; height: 100%; display: flex; align-items: center; justify-content: center; }
         .logo-box img { max-height: 90%; max-width: 100%; }
-        .title-box { flex: 1; text-align: center; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 10pt; line-height: 1.1; }
-        .nomor-urut-box { width: 13mm; height: 80%; background-color: #FFC000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12pt; border: 1px solid #000; }
+        .title-box { flex: 1; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; font-size: 10pt; line-height: 1.1; }
+        .nomor-urut-box {
+            width: 13mm; height: 80%; background-color: #FFC000;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 12pt; font-family: 'OCR-A BT', 'Courier New', monospace;
+            border: 1px solid #000;
+        }
         
-        /* Area Foto QR dikurangi 1mm menjadi 52mm */
-        .body-upper { display: flex; height: 52mm; border-bottom: 1px solid #000; }
-        .foto-container { width: 39.6mm; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; }
-        .foto-box { width: 30mm; height: 40mm; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; }
+        /* Area Foto & QR dikurangi 1mm sesuai diskusi */
+        .body-upper { display: flex; height: 52mm; border-bottom: 1px solid #000; box-sizing: border-box; }
+        
+        .foto-container { width: 39.6mm; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; }
+        .foto-box { width: 30mm; height: 40mm; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ccc; }
         .foto-box img { width: 100%; height: 100%; object-fit: cover; }
-        .qr-container { width: 45.4mm; display: flex; flex-direction: column; align-items: center; padding-top: 5px; }
-        .scan-text { color: #007bff; font-size: 9pt; text-decoration: underline; margin-bottom: 1.2em; }
-        .id-text { font-family: monospace; font-weight: bold; font-size: 10pt; margin-top: auto; margin-bottom: 5px; }
-        .nama-container { width: 100%; height: 12mm; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #000; font-weight: bold; font-size: 12pt; text-transform: uppercase; }
-        .table-container { width: 100%; flex: 1; }
-        table { width: 100%; height: 100%; border-collapse: collapse; font-size: 10pt; }
-        td { border: 1px solid #000; padding: 0 5px; }
-        .col-label { width: 31mm; }
+        .qr-container { width: 45.4mm; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 5px; box-sizing: border-box; }
+        .scan-text { color: #007bff; font-family: Arial, sans-serif; font-size: 9pt; text-decoration: underline; margin-bottom: 1.2em; }
+        .qr-canvas { width: 32mm; height: 32mm; display: flex; justify-content: center; }
+        .id-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 10pt; margin-top: auto; margin-bottom: 5px; }
+        
+        .nama-container {
+            width: 100%; height: 12mm; display: flex; align-items: center; justify-content: center;
+            text-align: center; border-bottom: 1px solid #000;
+            font-family: 'Arial Narrow', Arial, sans-serif; font-weight: bold; font-size: 12pt;
+            text-transform: uppercase; padding: 0 5px; box-sizing: border-box;
+        }
+        .table-container { width: 100%; flex: 1; box-sizing: border-box; }
+        table { width: 100%; height: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
+        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; box-sizing: border-box; }
+        table tr td:first-child { border-left: none; }
+        table tr td:last-child { border-right: none; }
+        table tr:last-child td { border-bottom: none; }
+        .col-label { width: 31mm; text-align: left; }
+        .col-val { width: 54mm; text-align: left; }
     </style>
 </head>
 <body>
 
     <div class="control-panel">
-        <h3 style="margin:0 0 5px 0">Panel Kontrol – Cetak Kartu EBTAQ</h3>
-        <div id="shift-container">Memuat data...</div>
+        <h3 style="margin: 0 0 5px 0;">Panel Kontrol – Cetak Kartu EBTAQ Final</h3>
+        <div id="shift-container">Memuat data Google Sheets...</div>
         <button class="btn-generate" onclick="generate()">GENERATE KARTU</button>
     </div>
 
@@ -71,48 +139,58 @@
 
 <script>
     const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=Biodata Cek';
-    const LOGO_FILENAME = "QIRAATI.png";
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Biodata Cek`; 
+    const LOGO_FILENAME = "QIRAATI.png"; 
+
     let groupedData = {};
 
-    function toTitleCase(str) { return str ? str.replace(/\w\S*/g, function(t){return t.charAt(0).toUpperCase()+t.substr(1).toLowerCase()}) : ''; }
-    
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr) return '';
-        const bulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-        const m = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-        if (m) { return m[1] + ' ' + bulan[parseInt(m[2])-1] + ' ' + m[3]; }
-        return dateStr;
+    function toTitleCase(str) {
+        if (!str) return '';
+        return str.replace(/\w\S*/g, function(txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
     }
 
-    // --- LOGIKA PANGGIL FOTO (ORIGIN - TANPA SIMBOL $) ---
-    function getDirectDriveUrl(url) {
-        if (!url) return '';
-        const matchId = url.match(/[-\w]{25,}/); 
-        if (matchId) {
-            // Menggunakan penggabungan tanda plus (+) untuk menghindari masalah simbol $
-            return "https://lh3.googleusercontent.com/d/$" + matchId[0];
+    function formatTanggalIndo(dateStr) {
+        if (!dateStr) return '';
+        const bulanIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        let d, m, y;
+        const matchSlash = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if (matchSlash) { d = parseInt(matchSlash[1]); m = parseInt(matchSlash[2]) - 1; y = matchSlash[3]; } 
+        else { 
+            const dateObj = new Date(dateStr); 
+            if (!isNaN(dateObj)) { d = dateObj.getDate(); m = dateObj.getMonth(); y = dateObj.getFullYear(); } 
         }
-        return url;
+        return (m >= 0 && m < 12) ? `${d} ${bulanIndo[m]} ${y}` : dateStr;
     }
+
+        // --- SOLUSI FIX FOTO GOOGLE DRIVE ---
+        const rawF = p['KIRIM PAS FOTO UKURAN POSTCARD'] || '';
+        const matchId = rawF.match(/[-\w]{25,}/); 
+        let fSrc = "";
+        if (matchId) {
+            // Menggunakan endpoint lh3.googleusercontent.com/d/ID 
+            // Jalur ini jauh lebih stabil untuk file gambar di Google Drive
+            fSrc = `https://lh3.googleusercontent.com/d/${matchId[0]}`;
+        }
 
     window.onload = async () => {
         try {
-            const res = await fetch(SHEET_URL);
-            const csv = await res.text();
-            process(csv);
-        } catch (e) { document.getElementById('shift-container').innerText = "Gagal memuat."; }
+            const response = await fetch(SHEET_URL);
+            const csvText = await response.text();
+            processDataForPanel(csvText);
+        } catch (e) {
+            document.getElementById('shift-container').innerText = "Gagal memuat data.";
+        }
     };
 
-    function process(csv) {
-        const rows = csv.trim().split('\n');
+    function processDataForPanel(csvText) {
+        const rows = csvText.trim().split('\n');
         const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toUpperCase());
         groupedData = {};
         for (let i = 1; i < rows.length; i++) {
-            const cols = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+            const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
             let p = {};
-            cols.forEach((v, j) => { p[headers[j]] = v ? v.trim().replace(/"/g, '') : ''; });
-            const key = (p['GELOMBANG'] || '?') + '-' + (p['SHIFT'] || '?');
+            rowData.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
+            const key = `${p['GELOMBANG'] || '?'}-${p['SHIFT'] || '?'}`;
             if (!groupedData[key]) groupedData[key] = [];
             groupedData[key].push(p);
         }
@@ -121,70 +199,78 @@
         Object.keys(groupedData).sort().forEach(k => {
             const label = document.createElement('label');
             label.className = 'cb-item';
-            label.innerHTML = '<input type="checkbox" name="chk-shift" value="' + k + '"> Gel ' + k.replace('-', ' - SFT ') + ' (' + groupedData[k].length + ')';
+            label.innerHTML = `<input type="checkbox" name="chk-shift" value="${k}"> Gel ${k.replace('-', ' - SFT ')} (${groupedData[k].length})`;
             container.appendChild(label);
         });
     }
 
     function generate() {
-        const sel = document.querySelectorAll('input[name="chk-shift"]:checked');
-        if (sel.length === 0) return alert("Pilih minimal satu!");
-        const out = document.getElementById('main-output');
-        out.innerHTML = '';
+        const selected = document.querySelectorAll('input[name="chk-shift"]:checked');
+        if (selected.length === 0) return alert("Pilih minimal satu Gelombang/Shift!");
+        const mainOutput = document.getElementById('main-output');
+        mainOutput.innerHTML = ''; 
         let filtered = [];
-        sel.forEach(cb => { filtered = filtered.concat(groupedData[cb.value]); });
+        selected.forEach(cb => { filtered = filtered.concat(groupedData[cb.value]); });
         filtered.sort((a, b) => parseInt(a['NOMOR'] || 0) - parseInt(b['NOMOR'] || 0));
-        render(filtered);
+        renderPages(filtered);
     }
 
-    function render(data) {
+    function renderPages(participants) {
         const perPage = 6;
-        const total = Math.ceil(data.length / perPage);
-        for (let i = 0; i < total; i++) {
+        const totalPages = Math.ceil(participants.length / perPage);
+        for (let i = 0; i < totalPages; i++) {
             const label = document.createElement('div');
             label.className = 'page-label';
-            label.innerText = 'HALAMAN ' + (i + 1) + ' DARI ' + total;
+            label.innerText = `HALAMAN ${i + 1} DARI ${totalPages}`;
             document.getElementById('main-output').appendChild(label);
             const page = document.createElement('div');
             page.className = 'page-container';
             const start = i * perPage;
-            const end = Math.min(start + perPage, data.length);
+            const end = Math.min(start + perPage, participants.length);
             for (let j = start; j < end; j++) {
-                page.appendChild(createCard(data[j], j));
-                setTimeout(() => { 
-                    const el = document.getElementById('qrcode-' + j);
-                    if(el) new QRCode(el, { text: data[j]['ID PENDAFTARAN'] || 'N/A', width: 120, height: 120 });
-                }, 50);
+                page.appendChild(createCardHTML(participants[j], j));
+                setTimeout(() => { generateQRCode(participants[j]['ID PENDAFTARAN'] || 'N/A', `qrcode-${j}`); }, 50);
             }
             document.getElementById('main-output').appendChild(page);
         }
     }
 
-    function createCard(p, idx) {
+    function createCardHTML(data, idx) {
         const card = document.createElement('div');
         card.className = 'kartu-peserta';
-        const TTL = toTitleCase(p['TEMPAT LAHIR']) + ', ' + formatTanggalIndo(p['TANGGAL LAHIR']);
-        const FOTO = getDirectDriveUrl(p['KIRIM PAS FOTO UKURAN POSTCARD']);
+        const TTL = `${toTitleCase(data['TEMPAT LAHIR'] || '')}, ${formatTanggalIndo(data['TANGGAL LAHIR'] || '')}`;
+        const FOTO_URL = getDirectDriveUrl(data['KIRIM PAS FOTO UKURAN POSTCARD'] || '');
         card.innerHTML = `
             <div class="header">
                 <div class="logo-box"><img src="${LOGO_FILENAME}" onerror="this.style.display='none'"></div>
                 <div class="title-box">EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)</div>
-                <div class="nomor-urut-box">${String(p['NOMOR'] || '0').padStart(3, '0')}</div>
+                <div class="nomor-urut-box">${String(data['NOMOR'] || '0').padStart(3, '0')}</div>
             </div>
             <div class="body-upper">
-                <div class="foto-container"><div class="foto-box"><img src="${FOTO}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'"></div></div>
-                <div class="qr-container"><div class="scan-text">Scan di sini!</div><div id="qrcode-${idx}" style="width:32mm; height:32mm; display:flex; justify-content:center;"></div><div class="id-text">${p['ID PENDAFTARAN'] || '-'}</div></div>
+                <div class="foto-container"><div class="foto-box"><img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'"></div></div>
+                <div class="qr-container">
+                    <div class="scan-text">Scan di sini!</div><div id="qrcode-${idx}" class="qr-canvas"></div><div class="id-text">${data['ID PENDAFTARAN'] || '-'}</div>
+                </div>
             </div>
-            <div class="nama-container">${(p['NAMA LENGKAP (SESUAI AKTA)'] || '-').toUpperCase()}</div>
+            <div class="nama-container">${(data['NAMA LENGKAP (SESUAI AKTA)'] || '-').toUpperCase()}</div>
             <div class="table-container">
-                <table>
-                    <tr><td class="col-label">Tpt. Tgl. Lahir</td><td style="text-transform:none">${TTL}</td></tr>
-                    <tr><td class="col-label">Nama Ayah</td><td>${(p['NAMA AYAH'] || '-').toUpperCase()}</td></tr>
-                    <tr><td class="col-label">Nama Ibu</td><td>${(p['NAMA IBU'] || '-').toUpperCase()}</td></tr>
-                    <tr><td class="col-label">Lembaga / TKQ</td><td>${p['ASAL LEMBAGA / TPQ'] || '-'}</td></tr>
+                <table cellspacing="0">
+                    <tr><td class="col-label">Tpt. Tgl. Lahir</td><td class="col-val" style="text-transform: none;">${TTL}</td></tr>
+                    <tr><td class="col-label">Nama Ayah</td><td class="col-val">${(data['NAMA AYAH'] || '-').toUpperCase()}</td></tr>
+                    <tr><td class="col-label">Nama Ibu</td><td class="col-val">${(data['NAMA IBU'] || '-').toUpperCase()}</td></tr>
+                    <tr><td class="col-label">Lembaga / TKQ</td><td class="col-val">${data['ASAL LEMBAGA / TPQ'] || '-'}</td></tr>
                 </table>
-            </div>`;
+            </div>
+        `;
         return card;
+    }
+
+    function generateQRCode(text, elementId) {
+        const el = document.getElementById(elementId);
+        if(el) {
+            el.innerHTML = "";
+            new QRCode(el, { text: text, width: 120, height: 120, correctLevel : QRCode.CorrectLevel.H });
+        }
     }
 </script>
 </body>

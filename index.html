@@ -169,13 +169,30 @@
     }
 
     // --- LOGIKA PANGGIL FOTO (ORIGIN STYLE) ---
-    function getDirectDriveUrl(url) {
-        if (!url) return '';
-        const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
-        if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/$${matchId[1]}`;
-        return url;
-    }
+    //function getDirectDriveUrl(url) {
+      //  if (!url) return '';
+      //  const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
+      //  if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/$${matchId[1]}`;
+      //  return url;
+    //}
 
+
+function getDirectDriveUrl(url) {
+    if (!url) return '';
+    // Regex yang lebih kuat untuk menangkap ID dari berbagai format link Drive
+    const matchId = url.match(/[-\w]{25,}/); 
+    if (matchId) {
+    const fileId = matchId[0]; 
+        // Opsi 1: Mengikuti LOGIKA ORIGIN (dengan perbaikan sintaks $)
+        // return `http://googleusercontent.com/profile/picture/${fileId}`;
+        // Opsi 2: ENDPOINT PALING STABIL SAAT INI (Sangat Disarankan)
+        // Jika Opsi 1 gagal, gunakan Opsi 2 ini:
+        return `https://lh3.googleusercontent.com/d/${fileId}`;
+    }
+    return url;
+}
+
+    
     // --- INITIAL FETCH & PANEL RENDER ---
     window.onload = async () => {
         try {
@@ -302,3 +319,4 @@
 </script>
 </body>
 </html>
+

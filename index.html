@@ -3,57 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu EBTAQ Final Margin F4</title>
+    <title>Kartu EBTAQ Final Hybrid | F4 Presisi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ================================================= */
-        /* 1. TAMPILAN LAYAR (FITRI STYLE)                   */
+        /* 1. TAMPILAN LAYAR (PANEL FITRI)                   */
         /* ================================================= */
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background-color: #525659;
-            margin: 0; padding: 20px 0;
+            background-color: #525659; margin: 0; padding: 20px 0;
             display: flex; flex-direction: column; align-items: center; 
             min-height: 100vh; text-align: center; 
         }
-
         .control-panel {
             background: #fff; width: 215mm; max-width: 95%;
             margin: 0 auto 20px auto; padding: 15px 20px; border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,.3); text-align: left;
             box-sizing: border-box; border: 1px solid #ddd;
         }
-
         #shift-container {
             border: 1px solid #ddd; padding: 8px; background: #fafafa; margin-bottom: 12px; 
             display: flex; flex-flow: column wrap; height: 85px; 
             overflow-x: auto; overflow-y: hidden; gap: 0 15px; 
             align-content: flex-start;
         }
-
         #shift-container::-webkit-scrollbar { height: 6px; }
         #shift-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        
         .cb-item { 
             font-size: 12px; cursor: pointer; display: flex; align-items: center; 
             gap: 6px; height: 26px; min-width: 150px; flex-shrink: 0; white-space: nowrap;
         }
-
         .btn-generate { 
             width: 100%; padding: 12px; font-weight: bold; font-size: 14px;
             background: #28a745; color: #fff; border: none; 
             cursor: pointer; border-radius: 4px; text-transform: uppercase;
         }
-
         .page-label {
             display: inline-block; background-color: #222; color: #fff;
             padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold;
-            margin-top: 10px; margin-bottom: 5px; z-index: 10;
+            margin-top: 10px; margin-bottom: 5px;
         }
 
         /* ================================================= */
-        /* 2. LAYOUT KERTAS F4 (MODIFIED ORIGIN)             */
+        /* 2. LAYOUT KERTAS F4 (SETTING PRESISI)             */
         /* ================================================= */
         .page-container {
             background-color: white; width: 215mm; height: 330mm; 
@@ -61,12 +54,12 @@
             box-sizing: border-box;
             display: grid;
             grid-template-columns: 85mm 85mm; 
-            grid-template-rows: repeat(3, 107mm); /* KUNCI: Tinggi kartu 107mm */
+            grid-template-rows: repeat(3, 107mm); /* Tinggi kartu baru */
             justify-content: center; 
-            align-content: start; /* KUNCI: Rata atas */
-            padding-top: 4mm;     /* KUNCI: Margin aman printer 4mm */
+            align-content: start; 
+            padding-top: 4mm;     /* Margin aman printer */
             column-gap: 10mm; 
-            row-gap: 0;           /* Rapatkan celah agar presisi */
+            row-gap: 1px;         /* Jarak antar baris untuk panduan potong */
             page-break-after: always; position: relative; text-align: left; 
             overflow: hidden;
         }
@@ -85,10 +78,10 @@
         }
 
         /* ================================================= */
-        /* 3. DESAIN KARTU (MURNI ORIGIN)                    */
+        /* 3. DESAIN KARTU (ORIGIN STYLE - 107mm)            */
         /* ================================================= */
         .kartu-peserta {
-            width: 85mm; height: 107mm; /* Total tinggi kartu berkurang 1mm */
+            width: 85mm; height: 107mm; /* Tinggi total kartu dikurangi */
             border: 2px solid #000; background: white;
             display: flex; flex-direction: column;
             box-sizing: border-box; position: relative; overflow: hidden;
@@ -100,7 +93,6 @@
         .logo-box { width: 13mm; height: 100%; display: flex; align-items: center; justify-content: center; }
         .logo-box img { max-height: 90%; max-width: 100%; }
         .title-box { flex: 1; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; font-size: 10pt; line-height: 1.1; }
-        
         .nomor-urut-box {
             width: 13mm; height: 80%; background-color: #FFC000;
             display: flex; align-items: center; justify-content: center;
@@ -108,13 +100,13 @@
             border: 1px solid #000;
         }
         
-        .body-upper { display: flex; height: 52mm; border-bottom: 1px solid #000; box-sizing: border-box; } /* Tinggi dikurangi 1mm */
+        /* Area Foto & QR dikurangi 1mm sesuai diskusi */
+        .body-upper { display: flex; height: 52mm; border-bottom: 1px solid #000; box-sizing: border-box; }
         
-        .foto-container { width: 39.6mm; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; box-sizing: border-box; }
+        .foto-container { width: 39.6mm; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; }
         .foto-box { width: 30mm; height: 40mm; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ccc; }
         .foto-box img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .qr-container { width: 45.4mm; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: start; padding-top: 5px; box-sizing: border-box; }
+        .qr-container { width: 45.4mm; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 5px; box-sizing: border-box; }
         .scan-text { color: #007bff; font-family: Arial, sans-serif; font-size: 9pt; text-decoration: underline; margin-bottom: 1.2em; }
         .qr-canvas { width: 32mm; height: 32mm; display: flex; justify-content: center; }
         .id-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 10pt; margin-top: auto; margin-bottom: 5px; }
@@ -125,7 +117,6 @@
             font-family: 'Arial Narrow', Arial, sans-serif; font-weight: bold; font-size: 12pt;
             text-transform: uppercase; padding: 0 5px; box-sizing: border-box;
         }
-        
         .table-container { width: 100%; flex: 1; box-sizing: border-box; }
         table { width: 100%; height: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
         td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; box-sizing: border-box; }
@@ -140,7 +131,6 @@
 
     <div class="control-panel">
         <h3 style="margin: 0 0 5px 0;">Panel Kontrol – Cetak Kartu EBTAQ Final</h3>
-        <p style="font-size: 11px; color: #666; margin: 0 0 10px 0;">Pilih Gelombang & Shift (Data akan diurutkan berdasarkan NOMOR):</p>
         <div id="shift-container">Memuat data Google Sheets...</div>
         <button class="btn-generate" onclick="generate()">GENERATE KARTU</button>
     </div>
@@ -154,7 +144,6 @@
 
     let groupedData = {};
 
-    // --- LOGIKA DATA MURNI ORIGIN ---
     function toTitleCase(str) {
         if (!str) return '';
         return str.replace(/\w\S*/g, function(txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
@@ -169,13 +158,11 @@
         else { 
             const dateObj = new Date(dateStr); 
             if (!isNaN(dateObj)) { d = dateObj.getDate(); m = dateObj.getMonth(); y = dateObj.getFullYear(); } 
-            else { return dateStr; } 
         }
-        if (m >= 0 && m < 12) { return `${d} ${bulanIndo[m]} ${y}`; }
-        return dateStr;
+        return (m >= 0 && m < 12) ? `${d} ${bulanIndo[m]} ${y}` : dateStr;
     }
 
-    // --- LOGIKA PANGGIL FOTO MURNI ORIGIN (FIXED $) ---
+    // --- FUNGSI FOTO VERSI ORIGIN (DENGAN SIMBOL $) ---
     function getDirectDriveUrl(url) {
         if (!url) return '';
         const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -185,7 +172,6 @@
         return url;
     }
 
-    // --- FETCH DATA ---
     window.onload = async () => {
         try {
             const response = await fetch(SHEET_URL);
@@ -199,18 +185,15 @@
     function processDataForPanel(csvText) {
         const rows = csvText.trim().split('\n');
         const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toUpperCase());
-        
         groupedData = {};
         for (let i = 1; i < rows.length; i++) {
             const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
             let p = {};
             rowData.forEach((val, idx) => { p[headers[idx]] = val ? val.trim().replace(/"/g, '') : ''; });
-            
             const key = `${p['GELOMBANG'] || '?'}-${p['SHIFT'] || '?'}`;
             if (!groupedData[key]) groupedData[key] = [];
             groupedData[key].push(p);
         }
-
         const container = document.getElementById('shift-container');
         container.innerHTML = '';
         Object.keys(groupedData).sort().forEach(k => {
@@ -224,39 +207,29 @@
     function generate() {
         const selected = document.querySelectorAll('input[name="chk-shift"]:checked');
         if (selected.length === 0) return alert("Pilih minimal satu Gelombang/Shift!");
-
         const mainOutput = document.getElementById('main-output');
         mainOutput.innerHTML = ''; 
-
         let filtered = [];
         selected.forEach(cb => { filtered = filtered.concat(groupedData[cb.value]); });
-        
-        // Sorting berdasarkan NOMOR sesuai Origin
         filtered.sort((a, b) => parseInt(a['NOMOR'] || 0) - parseInt(b['NOMOR'] || 0));
-        
         renderPages(filtered);
     }
 
     function renderPages(participants) {
         const perPage = 6;
         const totalPages = Math.ceil(participants.length / perPage);
-
         for (let i = 0; i < totalPages; i++) {
             const label = document.createElement('div');
             label.className = 'page-label';
             label.innerText = `HALAMAN ${i + 1} DARI ${totalPages}`;
             document.getElementById('main-output').appendChild(label);
-
             const page = document.createElement('div');
             page.className = 'page-container';
-
             const start = i * perPage;
             const end = Math.min(start + perPage, participants.length);
-
             for (let j = start; j < end; j++) {
                 page.appendChild(createCardHTML(participants[j], j));
-                const idPendaftaran = participants[j]['ID PENDAFTARAN'] || 'N/A';
-                setTimeout(() => { generateQRCode(idPendaftaran, `qrcode-${j}`); }, 50);
+                setTimeout(() => { generateQRCode(participants[j]['ID PENDAFTARAN'] || 'N/A', `qrcode-${j}`); }, 50);
             }
             document.getElementById('main-output').appendChild(page);
         }
@@ -265,10 +238,8 @@
     function createCardHTML(data, idx) {
         const card = document.createElement('div');
         card.className = 'kartu-peserta';
-
         const TTL = `${toTitleCase(data['TEMPAT LAHIR'] || '')}, ${formatTanggalIndo(data['TANGGAL LAHIR'] || '')}`;
         const FOTO_URL = getDirectDriveUrl(data['KIRIM PAS FOTO UKURAN POSTCARD'] || '');
-
         card.innerHTML = `
             <div class="header">
                 <div class="logo-box"><img src="${LOGO_FILENAME}" onerror="this.style.display='none'"></div>
@@ -276,15 +247,9 @@
                 <div class="nomor-urut-box">${String(data['NOMOR'] || '0').padStart(3, '0')}</div>
             </div>
             <div class="body-upper">
-                <div class="foto-container">
-                    <div class="foto-box">
-                        <img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'">
-                    </div>
-                </div>
+                <div class="foto-container"><div class="foto-box"><img src="${FOTO_URL}" onerror="this.style.display='none'; this.parentNode.innerText='NO FOTO'"></div></div>
                 <div class="qr-container">
-                    <div class="scan-text">Scan di sini!</div>
-                    <div id="qrcode-${idx}" class="qr-canvas"></div>
-                    <div class="id-text">${data['ID PENDAFTARAN'] || '-'}</div>
+                    <div class="scan-text">Scan di sini!</div><div id="qrcode-${idx}" class="qr-canvas"></div><div class="id-text">${data['ID PENDAFTARAN'] || '-'}</div>
                 </div>
             </div>
             <div class="nama-container">${(data['NAMA LENGKAP (SESUAI AKTA)'] || '-').toUpperCase()}</div>

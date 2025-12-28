@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu EBTAQ Final | Hybrid Origin-Fitri</title>
+    <title>Kartu EBTAQ Final Margin F4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ================================================= */
-        /* 1. TAMPILAN LAYAR (STYLE FITRI)                   */
+        /* 1. TAMPILAN LAYAR (FITRI STYLE)                   */
         /* ================================================= */
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -25,7 +25,6 @@
             box-sizing: border-box; border: 1px solid #ddd;
         }
 
-        /* Checkbox Container Maksimal 3 Baris (Fitri Style) */
         #shift-container {
             border: 1px solid #ddd; padding: 8px; background: #fafafa; margin-bottom: 12px; 
             display: flex; flex-flow: column wrap; height: 85px; 
@@ -54,7 +53,7 @@
         }
 
         /* ================================================= */
-        /* 2. LAYOUT KERTAS F4 (STYLE ORIGIN)                */
+        /* 2. LAYOUT KERTAS F4 (MODIFIED ORIGIN)             */
         /* ================================================= */
         .page-container {
             background-color: white; width: 215mm; height: 330mm; 
@@ -62,9 +61,12 @@
             box-sizing: border-box;
             display: grid;
             grid-template-columns: 85mm 85mm; 
-            grid-template-rows: repeat(3, auto);
-            justify-content: center; align-content: center;
-            column-gap: 10mm; row-gap: 1px;      
+            grid-template-rows: repeat(3, 107mm); /* KUNCI: Tinggi kartu 107mm */
+            justify-content: center; 
+            align-content: start; /* KUNCI: Rata atas */
+            padding-top: 4mm;     /* KUNCI: Margin aman printer 4mm */
+            column-gap: 10mm; 
+            row-gap: 0;           /* Rapatkan celah agar presisi */
             page-break-after: always; position: relative; text-align: left; 
             overflow: hidden;
         }
@@ -83,10 +85,10 @@
         }
 
         /* ================================================= */
-        /* 3. DESAIN KARTU MURNI ORIGIN                      */
+        /* 3. DESAIN KARTU (MURNI ORIGIN)                    */
         /* ================================================= */
         .kartu-peserta {
-            width: 85mm; height: 108mm; 
+            width: 85mm; height: 107mm; /* Total tinggi kartu berkurang 1mm */
             border: 2px solid #000; background: white;
             display: flex; flex-direction: column;
             box-sizing: border-box; position: relative; overflow: hidden;
@@ -98,16 +100,20 @@
         .logo-box { width: 13mm; height: 100%; display: flex; align-items: center; justify-content: center; }
         .logo-box img { max-height: 90%; max-width: 100%; }
         .title-box { flex: 1; text-align: center; font-family: 'Times New Roman', Times, serif; font-weight: bold; font-size: 10pt; line-height: 1.1; }
+        
         .nomor-urut-box {
             width: 13mm; height: 80%; background-color: #FFC000;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold; font-size: 12pt; font-family: 'OCR-A BT', 'Courier New', monospace;
             border: 1px solid #000;
         }
-        .body-upper { display: flex; height: 53mm; border-bottom: 1px solid #000; box-sizing: border-box; }
+        
+        .body-upper { display: flex; height: 52mm; border-bottom: 1px solid #000; box-sizing: border-box; } /* Tinggi dikurangi 1mm */
+        
         .foto-container { width: 39.6mm; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #000; box-sizing: border-box; }
         .foto-box { width: 30mm; height: 40mm; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ccc; }
         .foto-box img { width: 100%; height: 100%; object-fit: cover; }
+        
         .qr-container { width: 45.4mm; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: start; padding-top: 5px; box-sizing: border-box; }
         .scan-text { color: #007bff; font-family: Arial, sans-serif; font-size: 9pt; text-decoration: underline; margin-bottom: 1.2em; }
         .qr-canvas { width: 32mm; height: 32mm; display: flex; justify-content: center; }
@@ -122,19 +128,19 @@
         
         .table-container { width: 100%; flex: 1; box-sizing: border-box; }
         table { width: 100%; height: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }
+        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; box-sizing: border-box; }
         table tr td:first-child { border-left: none; }
         table tr td:last-child { border-right: none; }
         table tr:last-child td { border-bottom: none; }
-        td { border: 1px solid #000; padding: 0 5px; vertical-align: middle; box-sizing: border-box; }
         .col-label { width: 31mm; text-align: left; }
-        .col-val { width: 54mm; text-transform: uppercase; text-align: left; }
+        .col-val { width: 54mm; text-align: left; }
     </style>
 </head>
 <body>
 
     <div class="control-panel">
         <h3 style="margin: 0 0 5px 0;">Panel Kontrol – Cetak Kartu EBTAQ Final</h3>
-        <p style="font-size: 11px; color: #666; margin: 0 0 10px 0;">Pilih Gelombang & Shift (Scroll horizontal jika data banyak):</p>
+        <p style="font-size: 11px; color: #666; margin: 0 0 10px 0;">Pilih Gelombang & Shift (Data akan diurutkan berdasarkan NOMOR):</p>
         <div id="shift-container">Memuat data Google Sheets...</div>
         <button class="btn-generate" onclick="generate()">GENERATE KARTU</button>
     </div>
@@ -148,8 +154,9 @@
 
     let groupedData = {};
 
-    // --- LOGIKA DATA (ORIGIN STYLE) ---
+    // --- LOGIKA DATA MURNI ORIGIN ---
     function toTitleCase(str) {
+        if (!str) return '';
         return str.replace(/\w\S*/g, function(txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
     }
 
@@ -168,32 +175,17 @@
         return dateStr;
     }
 
-    // --- LOGIKA PANGGIL FOTO (ORIGIN STYLE) ---
-    //function getDirectDriveUrl(url) {
-      //  if (!url) return '';
-      //  const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
-      //  if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/$${matchId[1]}`;
-      //  return url;
-    //}
-
-
-function getDirectDriveUrl(url) {
-    if (!url) return '';
-    // Regex yang lebih kuat untuk menangkap ID dari berbagai format link Drive
-    const matchId = url.match(/[-\w]{25,}/); 
-    if (matchId) {
-    const fileId = matchId[0]; 
-        // Opsi 1: Mengikuti LOGIKA ORIGIN (dengan perbaikan sintaks $)
-        // return `http://googleusercontent.com/profile/picture/${fileId}`;
-        // Opsi 2: ENDPOINT PALING STABIL SAAT INI (Sangat Disarankan)
-        // Jika Opsi 1 gagal, gunakan Opsi 2 ini:
-        return `https://lh3.googleusercontent.com/d/${fileId}`;
+    // --- LOGIKA PANGGIL FOTO MURNI ORIGIN (FIXED $) ---
+    function getDirectDriveUrl(url) {
+        if (!url) return '';
+        const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
+        if (matchId && matchId[1]) {
+            return `http://googleusercontent.com/profile/picture/${matchId[1]}`;
+        }
+        return url;
     }
-    return url;
-}
 
-    
-    // --- INITIAL FETCH & PANEL RENDER ---
+    // --- FETCH DATA ---
     window.onload = async () => {
         try {
             const response = await fetch(SHEET_URL);
@@ -229,7 +221,6 @@ function getDirectDriveUrl(url) {
         });
     }
 
-    // --- GENERATOR KARTU ---
     function generate() {
         const selected = document.querySelectorAll('input[name="chk-shift"]:checked');
         if (selected.length === 0) return alert("Pilih minimal satu Gelombang/Shift!");
@@ -240,7 +231,7 @@ function getDirectDriveUrl(url) {
         let filtered = [];
         selected.forEach(cb => { filtered = filtered.concat(groupedData[cb.value]); });
         
-        // Urutkan berdasarkan NOMOR (Origin Style)
+        // Sorting berdasarkan NOMOR sesuai Origin
         filtered.sort((a, b) => parseInt(a['NOMOR'] || 0) - parseInt(b['NOMOR'] || 0));
         
         renderPages(filtered);
@@ -264,8 +255,8 @@ function getDirectDriveUrl(url) {
 
             for (let j = start; j < end; j++) {
                 page.appendChild(createCardHTML(participants[j], j));
-                const idAbsen = participants[j]['ID PENDAFTARAN'] || participants[j]['ID PENDAFTARAN'] || 'N/A';
-                setTimeout(() => { generateQRCode(idAbsen, `qrcode-${j}`); }, 50);
+                const idPendaftaran = participants[j]['ID PENDAFTARAN'] || 'N/A';
+                setTimeout(() => { generateQRCode(idPendaftaran, `qrcode-${j}`); }, 50);
             }
             document.getElementById('main-output').appendChild(page);
         }
@@ -276,7 +267,7 @@ function getDirectDriveUrl(url) {
         card.className = 'kartu-peserta';
 
         const TTL = `${toTitleCase(data['TEMPAT LAHIR'] || '')}, ${formatTanggalIndo(data['TANGGAL LAHIR'] || '')}`;
-        const FOTO_URL = getDirectDriveUrl(data['KIRIM PAS FOTO UKURAN POSTCARD'] || data['KIRIM PAS FOTO UKURAN POSTCARD']);
+        const FOTO_URL = getDirectDriveUrl(data['KIRIM PAS FOTO UKURAN POSTCARD'] || '');
 
         card.innerHTML = `
             <div class="header">
@@ -319,6 +310,3 @@ function getDirectDriveUrl(url) {
 </script>
 </body>
 </html>
-
-
-

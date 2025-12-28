@@ -163,13 +163,12 @@
     }
 
         // --- SOLUSI FIX FOTO GOOGLE DRIVE ---
-        const rawF = p['KIRIM PAS FOTO UKURAN POSTCARD'] || '';
-        const matchId = rawF.match(/[-\w]{25,}/); 
-        let fSrc = "";
-        if (matchId) {
-            // Menggunakan endpoint lh3.googleusercontent.com/d/ID 
-            // Jalur ini jauh lebih stabil untuk file gambar di Google Drive
-            fSrc = `https://lh3.googleusercontent.com/d/${matchId[0]}`;
+        function getDirectDriveUrl(url) {
+            if (!url) return '';
+            const matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
+            // Tetap menggunakan format yang Anda yakini berhasil
+            if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/$${matchId[1]}`;
+            return url;
         }
 
     window.onload = async () => {
@@ -275,3 +274,4 @@
 </script>
 </body>
 </html>
+

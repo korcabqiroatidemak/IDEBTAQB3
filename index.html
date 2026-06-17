@@ -98,74 +98,120 @@
 
     <div class="control-panel">
         <h3 style="margin: 0 0 5px 0;">Panel Kontrol – Cetak Kartu EBTAQ</h3>
-        <div id="shift-container">Memuat data dari Spreadsheet...</div>
+        <div id="shift-container">Memuat data dan mensinkronisasi jadwal...</div>
         <button class="btn-generate" onclick="generate()">GENERATE KARTU</button>
     </div>
 
     <div id="main-output"></div>
 
 <script>
-    const SHEET_ID = '1eIcvIgCLWG3F9jQdsw5XN9llOsK2PoYWKUg1qaQJyyA';
-    const SHEET_NAME = 'Biodata Cek';
-    const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const SHEET_ID = '180oIFF3WRaijxLn_LZiu12f0m5mTxZ8DY3w4t1Jd5FY';
+    const GID_BIO = '644681055';
+    // Gunakan nama sheet "LEMBAGA" (pastikan tidak ada spasi tersembunyi di tab Google Sheets)
+    const SHEET_LEMBAGA = 'LEMBAGA'; 
+    
+    const URL_BIO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_BIO}`;
+    const URL_LEMBAGA = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_LEMBAGA}`;
     const LOGO_URL = "QIRAATI.png"; 
 
     let fullData = [];
     let groupedData = {};
 
-    window.onload = fetchData;
+    window.onload = fetchAllData;
 
-    // --- FUNGSI PERBAIKAN TANGGAL & KOTA ---
+    // --- PARSER CSV UNIVERSAL ---
+    function parseCSV(csvText) {
+        const rows = csvText.trim().split('\n').filter(r => r.trim().length > 0);
+        if (rows.length < 2) return [];
+        const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toUpperCase());
+        const result = [];
+        for (let i = 1; i < rows.length; i++) {
+            const rowData = rows[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+            let obj = {};
+            rowData.forEach((val, idx) => {
+                obj[headers[idx]] = val ? val.trim().replace(/"/g, '') : '';
+            });
+            result.push(obj);
+        }
+        return result;
+    }
+
+    // --- FUNGSI AMBIL URL FOTO ---
+    function getDrivePhoto(url) {
+        if (!url || typeof url !== 'string') return '';
+        const matchId = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (matchId && matchId[1]) return `https://drive.google.com/thumbnail?id=${matchId[1]}&sz=w400`;
+        return url;
+    }
+
+    // --- FUNGSI FORMAT TANGGAL ---
     function formatTTL(kota, tglRaw) {
-        // 1. Format Kota (Capital Each Word)
         let kotaFormatted = kota ? kota.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '-';
         
-        // 2. Format Tanggal
-        let tglFormatted = tglRaw;
-        const bulanIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        // Menghapus tanda petik tunggal (') jika terbawa dari Google Sheets
+        let tglFormatted = tglRaw ? tglRaw.replace(/'/g, '').trim() : ''; 
+        const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        if (typeof tglRaw === 'string' && tglRaw.includes('Date(')) {
-            // Jika format Date(2014,1,12)
-            const match = tglRaw.match(/Date\((\d+),(\d+),(\d+)\)/);
-            if (match) {
-                tglFormatted = `${match[3]} ${bulanIndo[parseInt(match[2])]} ${match[1]}`;
-            }
-        } else if (typeof tglRaw === 'string' && tglRaw.includes('/')) {
-            // Jika format teks 12/2/2014
-            const p = tglRaw.split('/');
+        if (tglFormatted.includes('/')) {
+            const p = tglFormatted.split('/');
             if (p.length === 3) {
                 const bIdx = parseInt(p[1]) - 1;
                 tglFormatted = `${p[0]} ${bulanIndo[bIdx] || p[1]} ${p[2]}`;
             }
         }
 
-        return `${kotaFormatted}, ${tglFormatted}`;
+        return `${kotaFormatted}, ${tglFormatted || '-'}`;
     }
 
-    async function fetchData() {
+    // --- FETCH KEDUA SHEET DAN GABUNGKAN DATA ---
+    async function fetchAllData() {
         try {
-            const response = await fetch(DATA_URL);
-            const text = await response.text();
-            const jsonData = JSON.parse(text.substr(47).slice(0, -2));
-            const headers = jsonData.table.cols.map(col => col.label ? col.label.trim().toUpperCase() : '');
-            
-            fullData = jsonData.table.rows.map(row => {
-                let obj = {};
-                row.c.forEach((cell, idx) => {
-                    obj[headers[idx]] = cell ? (cell.f || cell.v || '') : '';
-                });
-                return obj;
+            const [resBio, resLembaga] = await Promise.all([
+                fetch(URL_BIO),
+                fetch(URL_LEMBAGA)
+            ]);
+
+            if (!resBio.ok || !resLembaga.ok) throw new Error("Gagal mengambil data dari Google Sheets.");
+
+            const csvBio = await resBio.text();
+            const csvLembaga = await resLembaga.text();
+
+            if (csvBio.startsWith("<!DOCTYPE html>")) throw new Error("Akses ditolak. Atur Share Google Sheets ke 'Siapa saja yang memiliki link'.");
+
+            const dataBio = parseCSV(csvBio);
+            const dataLembaga = parseCSV(csvLembaga);
+
+            // 1. Buat Kamus Referensi Jadwal Lembaga
+            const kamusLembaga = {};
+            dataLembaga.forEach(L => {
+                // Merakit "KORCAM - NAMA TPQ" agar persis seperti format "Asal Lembaga" di sheet BIO
+                const key = `${L['KORCAM']} - ${L['NAMA TPQ']}`;
+                kamusLembaga[key] = {
+                    gelombang: L['GEL'] || '?',
+                    shift: L['SHIFT'] || '?'
+                };
             });
+
+            // 2. Suntikkan Jadwal ke Data BIO
+            fullData = dataBio.map(peserta => {
+                const asalLembaga = peserta['ASAL LEMBAGA'] || '';
+                const jadwal = kamusLembaga[asalLembaga] || { gelombang: '?', shift: '?' };
+                
+                peserta['GELOMBANG_FINAL'] = jadwal.gelombang;
+                peserta['SHIFT_FINAL'] = jadwal.shift;
+                return peserta;
+            });
+
             processGroups();
         } catch (e) {
-            document.getElementById('shift-container').innerText = "Gagal memuat data. Periksa koneksi/izin Sheet.";
+            document.getElementById('shift-container').innerText = "Error: " + e.message;
         }
     }
 
     function processGroups() {
         groupedData = {};
         fullData.forEach(p => {
-            const key = `${p['GELOMBANG'] || '?'}-${p['SHIFT'] || '?'}`;
+            const key = `${p['GELOMBANG_FINAL']}-${p['SHIFT_FINAL']}`;
             if (!groupedData[key]) groupedData[key] = [];
             groupedData[key].push(p);
         });
@@ -180,21 +226,19 @@
         });
     }
 
-    function getDrivePhoto(url) {
-        if (!url || typeof url !== 'string') return '';
-        const match = url.match(/[-\w]{25,}/);
-        if (match) return `https://lh3.googleusercontent.com/d/${match[0]}=s1000`;
-        return url;
-    }
-
     function generate() {
         const selected = document.querySelectorAll('input[name="chk-shift"]:checked');
         if (selected.length === 0) return alert("Pilih minimal satu Gelombang/Shift!");
+        
         const mainOutput = document.getElementById('main-output');
         mainOutput.innerHTML = ''; 
         let filtered = [];
+        
         selected.forEach(cb => { filtered = filtered.concat(groupedData[cb.value]); });
-        filtered.sort((a, b) => parseInt(a['NOMOR'] || 0) - parseInt(b['NOMOR'] || 0));
+        
+        // Urutkan berdasarkan kolom "NO." dari sheet BIO
+        filtered.sort((a, b) => parseInt(a['NO.'] || 0) - parseInt(b['NO.'] || 0));
+        
         renderPages(filtered);
     }
 
@@ -210,12 +254,14 @@
             const page = document.createElement('div');
             page.className = 'page-container';
             const chunk = participants.slice(i, i + perPage);
+            
             chunk.forEach((data, idx) => {
                 const uniqueId = `qr-${pageIdx}-${idx}`;
                 page.appendChild(createCardHTML(data, uniqueId));
+                
                 setTimeout(() => {
                     new QRCode(document.getElementById(uniqueId), {
-                        text: String(data['ID PENDAFTARAN'] || 'N/A'),
+                        text: String(data['ID PESERTA'] || 'N/A'),
                         width: 110, height: 110
                     });
                 }, 150);
@@ -227,16 +273,22 @@
     function createCardHTML(data, qrId) {
         const card = document.createElement('div');
         card.className = 'kartu-peserta';
-        const fotoUrl = getDrivePhoto(data['KIRIM PAS FOTO UKURAN POSTCARD']);
         
-        // Memanggil fungsi format TTL (Kota & Tanggal)
+        // Pemetaan data berdasarkan Header Sheet BIO Baru
+        const fotoUrl = getDrivePhoto(data['FOTO']);
         const ttlFinal = formatTTL(data['TEMPAT LAHIR'], data['TANGGAL LAHIR']);
+        const nomorPeserta = String(data['NO.'] || '0').padStart(3, '0');
+        const idPeserta = data['ID PESERTA'] || '-';
+        const namaLengkap = (data['NAMA LENGKAP'] || '-').toUpperCase();
+        const namaAyah = (data['BIN'] || '-').toUpperCase();
+        const namaIbu = (data['BINTI'] || '-').toUpperCase();
+        const asalLembaga = data['ASAL LEMBAGA'] || '-';
         
         card.innerHTML = `
             <div class="header">
                 <div class="logo-box"><img src="${LOGO_URL}" onerror="this.style.visibility='hidden'"></div>
                 <div class="title-box">EVALUASI BELAJAR<br>TAHAP AKHIR QIROATI<br>(EBTAQ)</div>
-                <div class="nomor-urut-box">${String(data['NOMOR'] || '0').padStart(3, '0')}</div>
+                <div class="nomor-urut-box">${nomorPeserta}</div>
             </div>
             <div class="body-upper">
                 <div class="foto-container">
@@ -247,16 +299,16 @@
                 <div class="qr-container">
                     <div class="scan-text">Scan di sini!</div>
                     <div id="${qrId}" class="qr-canvas"></div>
-                    <div class="id-text">${data['ID PENDAFTARAN'] || '-'}</div>
+                    <div class="id-text">${idPeserta}</div>
                 </div>
             </div>
-            <div class="nama-container">${(data['NAMA LENGKAP (SESUAI AKTA)'] || '-').toUpperCase()}</div>
+            <div class="nama-container">${namaLengkap}</div>
             <div class="table-container">
                 <table>
                     <tr><td class="col-label">Tpt. Tgl. Lahir</td><td>${ttlFinal}</td></tr>
-                    <tr><td class="col-label">Nama Ayah</td><td>${(data['NAMA AYAH'] || '-').toUpperCase()}</td></tr>
-                    <tr><td class="col-label">Nama Ibu</td><td>${(data['NAMA IBU'] || '-').toUpperCase()}</td></tr>
-                    <tr><td class="col-label">Lembaga / TKQ</td><td>${data['ASAL LEMBAGA / TPQ'] || '-'}</td></tr>
+                    <tr><td class="col-label">Nama Ayah</td><td>${namaAyah}</td></tr>
+                    <tr><td class="col-label">Nama Ibu</td><td>${namaIbu}</td></tr>
+                    <tr><td class="col-label">Lembaga / TKQ</td><td>${asalLembaga}</td></tr>
                 </table>
             </div>
         `;
